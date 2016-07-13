@@ -1,0 +1,6 @@
+---
+automated_docker_image_name: winggundamth/devpi-server:xenial
+automated_docker_container_name: devpi-server
+automated_docker_hostname: devpi-server
+automated_docker_published_ports:
+  - "3141:3141"

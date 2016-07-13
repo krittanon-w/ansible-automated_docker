@@ -9,6 +9,7 @@
       restart_policy: "{{ automated_docker_restart_policy }}"
       keep_volumes: "{{ automated_docker_keep_volumes }}"
       recreate: "{{ automated_docker_recreate }}"
+      command: "{{ automated_docker_command|default(omit) }}"
       pull: "{{ automated_docker_pull_new_docker_images|default(omit) }}"
       published_ports: "{{ automated_docker_published_ports|default(omit) }}"
       exposed_ports: "{{ automated_docker_exposed_ports|default(omit) }}"
