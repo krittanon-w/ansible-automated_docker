@@ -1,0 +1,40 @@
+---
+- block: # Run Docker container
+
+  - name: Create container if not exists
+    docker_container:
+      name: "{{ automated_docker_container_name }}"
+      hostname: "{{ automated_docker_hostname }}"
+      image: "{{ automated_docker_image_name }}"
+      restart_policy: "{{ automated_docker_restart_policy }}"
+      keep_volumes: "{{ automated_docker_keep_volumes }}"
+      recreate: "{{ automated_docker_recreate }}"
+      pull: "{{ automated_docker_pull_new_docker_images|default(omit) }}"
+      published_ports: "{{ automated_docker_published_ports|default(omit) }}"
+      exposed_ports: "{{ automated_docker_exposed_ports|default(omit) }}"
+      links: "{{ automated_docker_links|default(omit) }}"
+      env: "{{ automated_docker_container_environment|default(omit) }}"
+      volumes: "{{ automated_docker_volumes|default(omit) }}"
+      log_driver: "{{ automated_docker_log_driver|default(omit) }}"
+      log_options: "{{ automated_docker_log_options|default(omit) }}"
+      state: present
+
+  - name: Add container to inventory
+    add_host:
+      name: "{{ automated_docker_container_name }}"
+      groups: automated_docker_container
+      ansible_connection: docker
+      ansible_user: root
+      ansible_docker_extra_args: "{{ automated_docker_extra_args | default(omit) }}"
+
+  - name: Include pre-run task
+    include: "{{ automated_docker_name }}/{{ automated_docker_name }}_pre_start.yml"
+    when: automated_docker_has_pre_start_container.stat.exists == true
+
+  - name: Start container
+    docker_container:
+      name: "{{ automated_docker_container_name }}"
+      state: started
+
+  tags:
+    - automated-docker-run

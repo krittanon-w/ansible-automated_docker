@@ -1,0 +1,12 @@
+---
+automated_docker_image_name: winggundamth/nginx:xenial
+automated_docker_container_name: nginx
+automated_docker_hostname: nginx
+automated_docker_published_ports:
+  - "80:80"
+  - "443:443"
+
+automated_docker_nginx_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_name }}/nginx.conf"
+automated_docker_nginx_host_config_file_paths: []
+automated_docker_nginx_config_path: /etc/nginx
+automated_docker_nginx_config_backup_path: /etc/nginx.bak

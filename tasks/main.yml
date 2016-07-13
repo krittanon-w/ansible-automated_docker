@@ -1,0 +1,16 @@
+---
+- name: Pre-tasks state
+  include: pre.yml
+
+# Need to use ansible_python_interpreter: python to make it work with
+# docker-py on virtualenv on local machine
+- name: Run Docker container state
+  include: run.yml
+  vars:
+    ansible_python_interpreter: python
+  environment: "{{ automated_docker_machine_environment | default({}) }}"
+
+# Customize container after ran
+- name: Post container configuration state
+  include: "{{ automated_docker_name }}/{{ automated_docker_name }}_config.yml"
+  when: automated_docker_has_post_config.stat.exists == true

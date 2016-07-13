@@ -1,0 +1,14 @@
+---
+automated_docker_machine_storage_path: "{{ playbook_dir }}/files/docker-machine"
+automated_docker_cert_path: "{{ automated_docker_machine_storage_path }}/machines/{{ inventory_hostname }}"
+automated_docker_machine_environment:
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_HOST: "{{ automated_docker_host.stdout }}"
+  DOCKER_CERT_PATH: "{{ automated_docker_cert_path }}"
+  DOCKER_MACHINE_NAME: "{{ inventory_hostname }}"
+
+# Default docker run variables
+automated_docker_pull_new_docker_images: no
+automated_docker_restart_policy: unless-stopped
+automated_docker_keep_volumes: yes
+automated_docker_recreate: no

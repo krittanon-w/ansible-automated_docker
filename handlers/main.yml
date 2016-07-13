@@ -1,0 +1,15 @@
+---
+# NOTE Ansible 2.x has serious issue with dynamic include handlers
+# Until this get fixed. We have to use main.yml as all-in-one handlers
+# https://github.com/ansible/ansible/issues/13485
+
+- name: Check nginx configuration and reload nginx
+  command: nginx -t
+  delegate_to: "{{ automated_docker_name }}"
+  notify: Reload nginx
+
+# Don't know why but service module is not working inside the container
+# So use command to reload service instead
+- name: Reload nginx
+  command: service nginx reload
+  delegate_to: "{{ automated_docker_name }}"
