@@ -23,7 +23,6 @@
 
 - block: # Copy all configuration files to nginx container
 
-  # TODO Backup and revert if check nginx configuration not passes
   # TODO Still need to delete and recreate directory again until
   # empty tag is coming here
   # https://github.com/ansible/ansible-modules-core/issues/902
@@ -31,7 +30,7 @@
     file:
       path: "{{ automated_docker_nginx_config_backup_path }}"
       state: absent
-    delegate_to: "{{ automated_docker_container_name }}"
+    delegate_to: "{{ automated_docker_run.name }}"
     when: |
       automated_docker_nginx_config_stat is defined and
       automated_docker_nginx_config_stat.exists == true
@@ -39,7 +38,7 @@
     file:
       path: "{{ automated_docker_nginx_config_backup_path }}"
       state: directory
-    delegate_to: "{{ automated_docker_container_name }}"
+    delegate_to: "{{ automated_docker_run.name }}"
     when: |
       automated_docker_nginx_config_stat is defined and
       automated_docker_nginx_config_stat.exists == true
@@ -47,7 +46,7 @@
   # docker container
   - name: Backup current nginx configuration file
     shell: mv {{ automated_docker_nginx_config_path }}/* {{ automated_docker_nginx_config_backup_path }}/
-    delegate_to: "{{ automated_docker_container_name }}"
+    delegate_to: "{{ automated_docker_run.name }}"
     when: |
       automated_docker_nginx_config_stat is defined and
       automated_docker_nginx_config_stat.exists == true
@@ -60,6 +59,8 @@
       automated_docker_nginx_config_stat.exists == true
     environment: "{{ automated_docker_machine_environment | default({}) }}"
     notify: Check nginx configuration and reload nginx
+
+  # TODO Backup and revert if check nginx configuration not passes
 
   tags:
     - nginx-container-config

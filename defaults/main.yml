@@ -1,14 +1,30 @@
 ---
 automated_docker_machine_storage_path: "{{ playbook_dir }}/files/docker-machine"
 automated_docker_cert_path: "{{ automated_docker_machine_storage_path }}/machines/{{ inventory_hostname }}"
-automated_docker_machine_environment:
+automated_docker_machine_environment_pre:
   DOCKER_TLS_VERIFY: 1
   DOCKER_HOST: "{{ automated_docker_host.stdout }}"
   DOCKER_CERT_PATH: "{{ automated_docker_cert_path }}"
   DOCKER_MACHINE_NAME: "{{ inventory_hostname }}"
 
 # Default docker run variables
-automated_docker_pull_new_docker_images: no
-automated_docker_restart_policy: unless-stopped
-automated_docker_keep_volumes: yes
-automated_docker_recreate: no
+automated_docker_container_default_pull: no
+automated_docker_container_default_restart_policy: unless-stopped
+automated_docker_container_default_recreate: no
+
+# NOTE All default variables for each container still need to be all in here
+# https://github.com/ansible/ansible/issues/14248
+# Until this PR has been implemented
+# https://github.com/ansible/proposals/pull/21
+
+# Default variables for Nginx
+automated_docker_nginx_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_name }}/nginx.conf"
+automated_docker_nginx_host_config_file_paths: []
+automated_docker_nginx_config_path: /etc/nginx
+automated_docker_nginx_config_backup_path: /etc/nginx.bak
+
+# Default variables for Graylog
+automated_docker_graylog_container_name: graylog
+automated_docker_mongo_container_name: mongo
+automated_docker_elasticsearch_container_name: elasticsearch
+automated_docker_elasticsearch_cluster_name: graylog

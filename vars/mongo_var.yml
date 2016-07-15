@@ -1,6 +1,8 @@
 ---
-automated_docker_image_name: mongo:3.3.9
-automated_docker_container_name: mongo
-automated_docker_hostname: mongo
-# automated_docker_published_ports:
-#  - "27017:27017"
+automated_docker_container_default:
+  mongo:
+    image: mongo:3.3.9
+    name: mongo
+    hostname: mongo
+    # published_ports:
+    #  - "27017:27017"

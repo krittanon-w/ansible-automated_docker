@@ -13,22 +13,21 @@
   environment:
     MACHINE_STORAGE_PATH: "{{ automated_docker_machine_storage_path }}"
 
+- name: Set docker-machine environment if not localhost
+  set_fact:
+    automated_docker_machine_environment: "{{ automated_docker_machine_environment_pre }}"
+  when: inventory_hostname != 'localhost'
+
 - name: Set Docker extra arguments variable
   set_fact:
     automated_docker_extra_args: --tlsverify --tlscacert="{{ automated_docker_cert_path }}/ca.pem" --tlscert="{{ automated_docker_cert_path }}/cert.pem" --tlskey="{{ automated_docker_cert_path }}/key.pem" -H="{{ automated_docker_host.stdout }}"
   when: inventory_hostname != 'localhost'
 
-- name: Check if has pre-start container tasks file
-  stat:
-    path: "{{ role_path }}/tasks/{{ automated_docker_name }}/{{ automated_docker_name }}_pre_start.yml"
-    get_md5: no
-  register: automated_docker_has_pre_start_container
+- name: Include docker container variables
+  include_vars: "{{ automated_docker_name }}_var.yml"
 
 - name: Check if has post container configuration tasks file
   stat:
     path: "{{ role_path }}/tasks/{{ automated_docker_name }}/{{ automated_docker_name }}_config.yml"
     get_md5: no
   register: automated_docker_has_post_config
-
-- name: Include container variables
-  include_vars: "{{ automated_docker_name }}_var.yml"

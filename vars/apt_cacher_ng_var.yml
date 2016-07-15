@@ -1,6 +1,8 @@
 ---
-automated_docker_image_name: winggundamth/apt-cacher-ng:xenial
-automated_docker_container_name: apt-cacher-ng
-automated_docker_hostname: apt-cacher-ng
-automated_docker_published_ports:
-  - "3142:3142"
+automated_docker_container_default:
+  apt_cacher_ng:
+    image: winggundamth/apt-cacher-ng:xenial
+    name: apt-cacher-ng
+    hostname: apt-cacher-ng
+    published_ports:
+      - "3142:3142"

@@ -1,15 +1,17 @@
 ---
-automated_docker_image_name: elasticsearch:2.3.4
-automated_docker_container_name: elasticsearch
-automated_docker_hostname: elasticsearch
-automated_docker_command: elasticsearch -Des.node.name="{{ automated_docker_elasticsearch_cluster_name }}"
-automated_docker_volumes:
-  - /usr/share/elasticsearch/config
-  - /usr/share/elasticsearch/data
-automated_docker_container_environment:
-  ES_HEAP_SIZE: 512m
-# automated_docker_published_ports:
-#   - "9200:9200"
-#   - "9300:9300"
+automated_docker_container_default:
+  elasticsearch:
+    image: elasticsearch:2.3.4
+    name: elasticsearch
+    hostname: elasticsearch
+    command: elasticsearch -Des.node.name="{{ automated_docker_elasticsearch_cluster_name }}"
+    volumes:
+      - /usr/share/elasticsearch/config
+      - /usr/share/elasticsearch/data
+    env:
+      ES_HEAP_SIZE: 512m
+    # published_ports:
+    #   - "9200:9200"
+    #   - "9300:9300"
 
 automated_docker_elasticsearch_cluster_name: ElasticSearchCluster
