@@ -35,12 +35,13 @@
       published_ports: "{{ automated_docker_run.published_ports | default(omit) }}"
       exposed_ports: "{{ automated_docker_run.exposed_ports | default(omit) }}"
       links: "{{ automated_docker_run.links | default(omit) }}"
-      env: "{{ automated_docker_run.environment | default(omit) }}"
+      env: "{{ automated_docker_run.env | default(omit) }}"
       volumes: "{{ automated_docker_run.volumes | default(omit) }}"
       log_driver: "{{ automated_docker_run.log_driver | default(omit) }}"
       log_options: "{{ automated_docker_run.log_options | default(omit) }}"
       volumes_from: "{{ (automated_docker_run.upgrade is defined and automated_docker_run.upgrade) | ternary(automated_docker_container_stopped_name, omit) }}"
       state: present
+    register: automated_docker_create_result
 
   - name: Add container to inventory
     add_host:
@@ -54,12 +55,12 @@
 
   - name: Check if has pre-start container tasks file
     stat:
-      path: "{{ role_path }}/tasks/{{ automated_docker_run.name }}/{{ automated_docker_run.name }}_pre_start.yml"
+      path: "{{ role_path }}/tasks/{{ automated_docker_container.key }}/{{ automated_docker_container.key }}_pre_start.yml"
       get_md5: no
     register: automated_docker_has_pre_start_container
 
   - name: Include pre-run task
-    include: "{{ automated_docker_name }}/{{ automated_docker_name }}_pre_start.yml"
+    include: "{{ automated_docker_container.key }}/{{ automated_docker_container.key }}_pre_start.yml"
     when: automated_docker_has_pre_start_container.stat.exists == true
 
 - block: # Start container
@@ -73,12 +74,12 @@
 
   - name: Check if has post-start container tasks file
     stat:
-      path: "{{ role_path }}/tasks/{{ automated_docker_run.name }}/{{ automated_docker_run.name }}_post_start.yml"
+      path: "{{ role_path }}/tasks/{{ automated_docker_container.key }}/{{ automated_docker_container.key }}_post_start.yml"
       get_md5: no
     register: automated_docker_has_post_start_container
 
   - name: Include post-run task
-    include: "{{ automated_docker_name }}/{{ automated_docker_name }}_post_start.yml"
+    include: "{{ automated_docker_container.key }}/{{ automated_docker_container.key }}_post_start.yml"
     when: automated_docker_has_post_start_container.stat.exists == true
 
   tags:
