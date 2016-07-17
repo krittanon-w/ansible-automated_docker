@@ -53,7 +53,7 @@
 
   # Need to use docker cp because copy module does not support copy symlink file
   - name: Copy new nginx configuration file
-    command: docker cp "{{ automated_docker_nginx_config_stat.path | dirname }}/." nginx:"{{ automated_docker_nginx_config_path }}"
+    command: docker cp "{{ automated_docker_nginx_config_stat.path | dirname }}/." "{{ automated_docker_run.name }}":"{{ automated_docker_nginx_config_path }}"
     when: |
       automated_docker_nginx_config_stat is defined and
       automated_docker_nginx_config_stat.exists == true
