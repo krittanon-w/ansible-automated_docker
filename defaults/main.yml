@@ -28,3 +28,7 @@ automated_docker_graylog_container_name: graylog
 automated_docker_mongo_container_name: mongo
 automated_docker_elasticsearch_container_name: elasticsearch
 automated_docker_elasticsearch_cluster_name: graylog
+
+# Default variables for MariaDB
+automated_docker_mariadb_backup_file:
+automated_docker_mariadb_container_backup_file: /tmp/backup.sql

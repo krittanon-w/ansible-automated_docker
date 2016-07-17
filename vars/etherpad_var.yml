@@ -1,0 +1,26 @@
+---
+automated_docker_container_default:
+  etherpad:
+    image: tvelocity/etherpad-lite:latest
+    name: etherpad
+    hostname: etherpad
+    links:
+      - mariadb:mysql
+    published_ports:
+      - "9001:9001"
+    env:
+      ETHERPAD_TITLE: Etherpad
+      ETHERPAD_ADMIN_PASSWORD: CHANGEME
+      ETHERPAD_ADMIN_USER: admin
+      ETHERPAD_DB_USER: etherpad
+      ETHERPAD_DB_PASSWORD: CHANGEME
+      ETHERPAD_DB_NAME: etherpad
+  mariadb:
+    image: mariadb:10.1.14
+    name: mariadb
+    hostname: mariadb
+    env:
+      MYSQL_ROOT_PASSWORD: CHANGEME
+      MYSQL_USER: etherpad
+      MYSQL_PASSWORD: CHANGEME
+      MYSQL_DATABASE: etherpad
