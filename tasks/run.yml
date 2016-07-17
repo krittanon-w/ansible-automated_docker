@@ -1,9 +1,27 @@
 ---
-- block: # Run Docker container
 
-  - name: Combine docker container variable
+- name: Combine docker container variable
+  set_fact:
+    automated_docker_run: "{{ automated_docker_container_default[automated_docker_container.key] | combine(automated_docker_container.value) }}"
+
+- block: # Pre-upgrade container
+
+  # TODO Change to use docker_container action when state: stopped is fix
+  # https://github.com/ansible/ansible-modules-core/issues/4199
+  - name: Stop current running container
+    command: "docker stop {{ automated_docker_run.name }}"
+    when: automated_docker_run.upgrade is defined and automated_docker_run.upgrade
+
+  - name: Set container stopped name variable
     set_fact:
-      automated_docker_run: "{{ automated_docker_container_default[automated_docker_container.key] | combine(automated_docker_container.value) }}"
+      automated_docker_container_stopped_name: "{{ automated_docker_run.name }}-stopped"
+    when: automated_docker_run.upgrade is defined and automated_docker_run.upgrade
+
+  - name: Rename stopped container
+    command: "docker rename {{ automated_docker_run.name }} {{ automated_docker_container_stopped_name }}"
+    when: automated_docker_run.upgrade is defined and automated_docker_run.upgrade
+
+- block: # Run Docker container
 
   - name: Create container if not exists
     docker_container:
@@ -20,7 +38,8 @@
       env: "{{ automated_docker_run.environment | default(omit) }}"
       volumes: "{{ automated_docker_run.volumes | default(omit) }}"
       log_driver: "{{ automated_docker_run.log_driver | default(omit) }}"
-      log_options: "{{ automated_docker_run.log_options |  default(omit) }}"
+      log_options: "{{ automated_docker_run.log_options | default(omit) }}"
+      volumes_from: "{{ (automated_docker_run.upgrade is defined and automated_docker_run.upgrade) | ternary(automated_docker_container_stopped_name, omit) }}"
       state: present
 
   - name: Add container to inventory
