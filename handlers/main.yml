@@ -3,6 +3,18 @@
 # Until this get fixed. We have to use main.yml as all-in-one handlers
 # https://github.com/ansible/ansible/issues/13485
 
+# Need to use ansible_python_interpreter: python to make it work with
+# docker-py on virtualenv on local machine
+- name: Restart container
+  docker_container:
+    name: "{{ automated_docker_run.name }}"
+    restart: true
+    state: started
+  vars:
+    ansible_python_interpreter: python
+
+
+# Handlers for Nginx container
 - name: Check nginx configuration and reload nginx
   command: nginx -t
   delegate_to: "{{ automated_docker_run.name }}"

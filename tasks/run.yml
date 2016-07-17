@@ -1,10 +1,6 @@
 ---
 - block: # Prepare variables
 
-  - name: Reset restart container flag
-    set_fact:
-      automated_docker_need_restart: false
-
   - name: Combine docker container variable
     set_fact:
       automated_docker_run: "{{ automated_docker_container_default[automated_docker_container.key] | combine(automated_docker_container.value) }}"
@@ -77,7 +73,6 @@
   - name: Start "{{ automated_docker_run.name }}" container or restart if needed
     docker_container:
       name: "{{ automated_docker_run.name }}"
-      restart: "{{ automated_docker_need_restart }}"
       state: started
 
 
@@ -95,3 +90,6 @@
 
   tags:
     - automated-docker-run
+
+
+- meta: flush_handlers

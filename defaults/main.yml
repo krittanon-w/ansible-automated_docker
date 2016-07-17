@@ -44,6 +44,9 @@ automated_docker_etherpad_mariadb_container_dbname: etherpad
 automated_docker_registry_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/config.yml"
 automated_docker_registry_host_config_file_paths: []
 automated_docker_registry_container_config_file_path: /etc/docker/registry/config.yml
+automated_docker_registry_host_auth_token_rootcertbundle: "{{ role_path }}/files/gitlab/registry-auth.crt"
+automated_docker_registry_config_example_url: https://raw.githubusercontent.com/docker/distribution-library-image/v2.4.1/registry/config-example.yml
+automated_docker_registry_config_example_tmp_path: /tmp/docker-registry-config-example.yml
 
 # Default variables for Docker GitLab
 automated_docker_gitlab_container_name: gitlab
