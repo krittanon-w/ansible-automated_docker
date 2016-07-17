@@ -10,3 +10,4 @@ automated_docker_container_default:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: CHANGEME
       POSTGRES_DB: postgresdb
+    extensions: []

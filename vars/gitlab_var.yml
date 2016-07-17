@@ -32,6 +32,8 @@ automated_docker_container_default:
       POSTGRES_USER: gitlab
       POSTGRES_PASSWORD: CHANGEME
       POSTGRES_DB: gitlab
+    extensions:
+      - pg_trgm
   redis:
     image: redis:3.2.0-alpine
     name: "{{ automated_docker_gitlab_redis_container_name }}"
