@@ -5,7 +5,7 @@ automated_docker_container_default:
     name: "{{ automated_docker_etherpad_container_name }}"
     hostname: "{{ automated_docker_etherpad_container_name }}"
     links:
-      - "{{ automated_docker_etherpad_mariadb_container_name }}":mysql
+      - "{{ automated_docker_etherpad_mariadb_container_name }}:mysql"
     published_ports:
       - "9001:9001"
     env:
