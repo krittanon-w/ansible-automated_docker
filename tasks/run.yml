@@ -1,15 +1,20 @@
 ---
+- block: # Prepare variables
 
-- name: Combine docker container variable
-  set_fact:
-    automated_docker_run: "{{ automated_docker_container_default[automated_docker_container.key] | combine(automated_docker_container.value) }}"
+  - name: Reset restart container flag
+    set_fact:
+      automated_docker_need_restart: false
+
+  - name: Combine docker container variable
+    set_fact:
+      automated_docker_run: "{{ automated_docker_container_default[automated_docker_container.key] | combine(automated_docker_container.value) }}"
 
 
 - block: # Pre-upgrade container
 
   # TODO Change to use docker_container action when state: stopped is fix
   # https://github.com/ansible/ansible-modules-core/issues/4199
-  - name: Stop current running container
+  - name: Stop "{{ automated_docker_run.name }}" container in case of upgrade
     command: "docker stop {{ automated_docker_run.name }}"
     when: automated_docker_run.upgrade is defined and automated_docker_run.upgrade
 
@@ -25,7 +30,7 @@
 
 - block: # Run Docker container
 
-  - name: Create container if not exists
+  - name: Create "{{ automated_docker_run.name }}" container if not exists
     docker_container:
       name: "{{ automated_docker_run.name }}"
       hostname: "{{ automated_docker_run.hostname }}"
@@ -45,7 +50,7 @@
       state: present
     register: automated_docker_create_result
 
-  - name: Add container to inventory
+  - name: Add "{{ automated_docker_run.name }}" container to inventory
     add_host:
       name: "{{ automated_docker_run.name }}"
       groups: automated_docker_containers
@@ -56,34 +61,35 @@
 
 - block: # Run pre-start configure on container
 
-  - name: Check if has pre-start container tasks file
+  - name: Check if "{{ automated_docker_run.name }}" has pre-start container tasks file
     stat:
       path: "{{ role_path }}/tasks/{{ automated_docker_container.key }}/{{ automated_docker_container.key }}_pre_start.yml"
       get_md5: no
     register: automated_docker_has_pre_start_container
 
-  - name: Include pre-run task
+  - name: Include "{{ automated_docker_run.name }}" pre-run task
     include: "{{ automated_docker_container.key }}/{{ automated_docker_container.key }}_pre_start.yml"
     when: automated_docker_has_pre_start_container.stat.exists == true
 
 
 - block: # Start container
 
-  - name: Start container
+  - name: Start "{{ automated_docker_run.name }}" container or restart if needed
     docker_container:
       name: "{{ automated_docker_run.name }}"
+      restart: "{{ automated_docker_need_restart }}"
       state: started
 
 
 - block: # Run post-start configure on container
 
-  - name: Check if has post-start container tasks file
+  - name: Check if "{{ automated_docker_run.name }}" has post-start container tasks file
     stat:
       path: "{{ role_path }}/tasks/{{ automated_docker_container.key }}/{{ automated_docker_container.key }}_post_start.yml"
       get_md5: no
     register: automated_docker_has_post_start_container
 
-  - name: Include post-run task
+  - name: Include "{{ automated_docker_run.name }}" post-run task
     include: "{{ automated_docker_container.key }}/{{ automated_docker_container.key }}_post_start.yml"
     when: automated_docker_has_post_start_container.stat.exists == true
 

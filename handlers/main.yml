@@ -13,13 +13,3 @@
 - name: Reload nginx
   command: service nginx reload
   delegate_to: "{{ automated_docker_run.name }}"
-
-# Need to use ansible_python_interpreter: python to make it work with
-# docker-py on virtualenv on local machine
-- name: Restart container
-  docker_container:
-    name: "{{ automated_docker_run.name }}"
-    restart: true
-    state: started
-  vars:
-    ansible_python_interpreter: python

@@ -29,4 +29,9 @@
     when: |
       automated_docker_registry_config_stat is defined and
       automated_docker_registry_config_stat.exists == true
-    notify: Restart container
+    register: automated_docker_registry_is_configure
+
+  - name: Set flag to restart container if needed
+    set_fact:
+      automated_docker_need_restart: true
+    when: automated_docker_registry_is_configure.changed
