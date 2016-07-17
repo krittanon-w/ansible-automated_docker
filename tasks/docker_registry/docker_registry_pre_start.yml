@@ -52,12 +52,12 @@
 
   - name: Copy docker registry auth token certificate
     command: |
-      docker cp "{{ automated_docker_registry_host_auth_token_rootcertbundle }}" \
+      docker cp "{{ automated_docker_registry_host_auth_token_rootcertbundle_file_path }}" \
       "{{ automated_docker_run.name }}":"{{ automated_docker_run.env.REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE }}"
     when: automated_docker_run.env.REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE is defined
     notify: Restart container
 
-  - name: Remove docker registry auth token certificate if not exists
+  - name: Remove docker registry auth token certificate if doesn't apply
     command: |
       docker exec "{{ automated_docker_run.name }}" \
       rm -f "{{ automated_docker_registry_container_config_file_path }}"

@@ -44,7 +44,7 @@ automated_docker_etherpad_mariadb_container_dbname: etherpad
 automated_docker_registry_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/config.yml"
 automated_docker_registry_host_config_file_paths: []
 automated_docker_registry_container_config_file_path: /etc/docker/registry/config.yml
-automated_docker_registry_host_auth_token_rootcertbundle: "{{ role_path }}/files/gitlab/registry-auth.crt"
+automated_docker_registry_host_auth_token_rootcertbundle_file_path: "{{ role_path }}/files/gitlab/registry-auth.crt"
 automated_docker_registry_config_example_url: https://raw.githubusercontent.com/docker/distribution-library-image/v2.4.1/registry/config-example.yml
 automated_docker_registry_config_example_tmp_path: /tmp/docker-registry-config-example.yml
 
@@ -53,3 +53,6 @@ automated_docker_gitlab_container_name: gitlab
 automated_docker_gitlab_postgresql_container_name: gitlab-postgresql
 automated_docker_gitlab_redis_container_name: gitlab-redis
 automated_docker_gitlab_registry_container_name: gitlab-registry
+automated_docker_gitlab_registry_key_file_path: "{{ role_path }}/files/gitlab/registry-auth.key"
+automated_docker_gitlab_registry_ssl_key_file_path: "{{ role_path }}/files/gitlab/registry-auth.key"
+automated_docker_gitlab_registry_ssl_crt_file_path: "{{ role_path }}/files/gitlab/registry-auth.crt"
