@@ -68,6 +68,9 @@
     when: automated_docker_has_pre_start_container.stat.exists == true
 
 
+- meta: flush_handlers
+
+
 - block: # Start container
 
   - name: Start "{{ automated_docker_run.name }}" container or restart if needed
