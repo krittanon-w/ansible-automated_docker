@@ -25,13 +25,20 @@ automated_docker_nginx_config_backup_path: /etc/nginx.bak
 
 # Default variables for Graylog
 automated_docker_graylog_container_name: graylog
-automated_docker_mongo_container_name: mongo
-automated_docker_elasticsearch_container_name: elasticsearch
-automated_docker_elasticsearch_cluster_name: graylog
+automated_docker_graylog_mongo_container_name: mongo
+automated_docker_graylog_elasticsearch_container_name: elasticsearch
+automated_docker_graylog_elasticsearch_cluster_name: graylog
 
 # Default variables for MariaDB
 automated_docker_mariadb_backup_file:
 automated_docker_mariadb_container_backup_file: /tmp/backup.sql
+
+# Default variables for Etherpad
+automated_docker_etherpad_container_name: etherpad
+automated_docker_etherpad_mariadb_container_name: mariadb
+automated_docker_etherpad_mariadb_container_username: etherpad
+automated_docker_etherpad_mariadb_container_password: CHANGEME
+automated_docker_etherpad_mariadb_container_dbname: etherpad
 
 # Default variables for Docker Registry
 automated_docker_registry_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/config.yml"
