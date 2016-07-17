@@ -18,8 +18,6 @@
       automated_docker_nginx_config_stat: "{{ automated_docker_nginx_config_check.results[0].stat }}"
     when: automated_docker_nginx_config_check.results[0].stat is defined
 
-  tags:
-    - nginx-container-config
 
 - block: # Copy all configuration files to nginx container
 
@@ -61,6 +59,3 @@
     notify: Check nginx configuration and reload nginx
 
   # TODO Backup and revert if check nginx configuration not passes
-
-  tags:
-    - nginx-container-config

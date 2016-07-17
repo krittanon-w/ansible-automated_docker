@@ -18,7 +18,7 @@ automated_docker_container_default_recreate: no
 # https://github.com/ansible/proposals/pull/21
 
 # Default variables for Nginx
-automated_docker_nginx_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_name }}/nginx.conf"
+automated_docker_nginx_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/nginx.conf"
 automated_docker_nginx_host_config_file_paths: []
 automated_docker_nginx_config_path: /etc/nginx
 automated_docker_nginx_config_backup_path: /etc/nginx.bak
@@ -32,3 +32,8 @@ automated_docker_elasticsearch_cluster_name: graylog
 # Default variables for MariaDB
 automated_docker_mariadb_backup_file:
 automated_docker_mariadb_container_backup_file: /tmp/backup.sql
+
+# Default variables for Docker Registry
+automated_docker_registry_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/config.yml"
+automated_docker_registry_host_config_file_paths: []
+automated_docker_registry_container_config_file_path: /etc/docker/registry/config.yml

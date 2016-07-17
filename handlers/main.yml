@@ -5,11 +5,21 @@
 
 - name: Check nginx configuration and reload nginx
   command: nginx -t
-  delegate_to: "{{ automated_docker_name }}"
+  delegate_to: "{{ automated_docker_run.name }}"
   notify: Reload nginx
 
 # Don't know why but service module is not working inside the container
 # So use command to reload service instead
 - name: Reload nginx
   command: service nginx reload
-  delegate_to: "{{ automated_docker_name }}"
+  delegate_to: "{{ automated_docker_run.name }}"
+
+# Need to use ansible_python_interpreter: python to make it work with
+# docker-py on virtualenv on local machine
+- name: Restart container
+  docker_container:
+    name: "{{ automated_docker_run.name }}"
+    restart: true
+    state: started
+  vars:
+    ansible_python_interpreter: python

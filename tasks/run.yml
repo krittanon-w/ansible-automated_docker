@@ -4,6 +4,7 @@
   set_fact:
     automated_docker_run: "{{ automated_docker_container_default[automated_docker_container.key] | combine(automated_docker_container.value) }}"
 
+
 - block: # Pre-upgrade container
 
   # TODO Change to use docker_container action when state: stopped is fix
@@ -20,6 +21,7 @@
   - name: Rename stopped container
     command: "docker rename {{ automated_docker_run.name }} {{ automated_docker_container_stopped_name }}"
     when: automated_docker_run.upgrade is defined and automated_docker_run.upgrade
+
 
 - block: # Run Docker container
 
@@ -51,6 +53,7 @@
       ansible_user: root
       ansible_docker_extra_args: "{{ automated_docker_extra_args | default(omit) }}"
 
+
 - block: # Run pre-start configure on container
 
   - name: Check if has pre-start container tasks file
@@ -63,12 +66,14 @@
     include: "{{ automated_docker_container.key }}/{{ automated_docker_container.key }}_pre_start.yml"
     when: automated_docker_has_pre_start_container.stat.exists == true
 
+
 - block: # Start container
 
   - name: Start container
     docker_container:
       name: "{{ automated_docker_run.name }}"
       state: started
+
 
 - block: # Run post-start configure on container
 
