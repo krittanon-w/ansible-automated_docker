@@ -56,10 +56,3 @@
       "{{ automated_docker_run.name }}":"{{ automated_docker_run.env.REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE }}"
     when: automated_docker_run.env.REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE is defined
     notify: Restart container
-
-  - name: Remove docker registry auth token certificate if doesn't apply
-    command: |
-      docker exec "{{ automated_docker_run.name }}" \
-      rm -f "{{ automated_docker_registry_container_config_file_path }}"
-    when: automated_docker_run.env.REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE is not defined
-    notify: Restart container
