@@ -26,6 +26,13 @@
 
 - block: # Run Docker container
 
+  # TODO Until these has been fixed
+  # https://github.com/ansible/ansible-modules-core/issues/4116
+  # https://github.com/ansible/ansible/issues/7367
+  - name: Work around to fix problem on Docker for Mac public beta
+    command: "docker run --rm=true {{ automated_docker_run.image }} true"
+    when: ansible_system == 'Darwin'
+
   - name: Create "{{ automated_docker_run.name }}" container if not exists
     docker_container:
       name: "{{ automated_docker_run.name }}"
