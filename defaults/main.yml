@@ -58,8 +58,18 @@ automated_docker_gitlab_registry_ssl_key_file_path: "{{ role_path }}/files/gitla
 automated_docker_gitlab_registry_ssl_crt_file_path: "{{ role_path }}/files/gitlab/registry-auth.crt"
 
 # Default variables for HAProxy
+automated_docker_haproxy_template_file: haproxy.cfg.j2
 automated_docker_haproxy_host_tmp_config_path: /tmp/container-haproxy.cfg
 automated_docker_haproxy_container_config_path: /usr/local/etc/haproxy/haproxy.cfg
 automated_docker_haproxy_srv_fqdn: "{{ automated_docker_haproxy_service_name }}._http._tcp.{{ automated_docker_haproxy_domain_name }}."
 #automated_docker_haproxy_service_name: service-test
 #automated_docker_haproxy_domain_name: example.org
+
+# Default variables for Keepalived
+automated_docker_keepalived_template_file: keepalived.conf.j2
+automated_docker_keepalived_host_tmp_config_path: /tmp/container-keepalived.conf
+automated_docker_keepalived_container_config_path: /etc/keepalived/keepalived.conf
+automated_docker_keepalived_instance: haproxy-test
+automated_docker_keepalived_auth_pass: CHANGEME
+automated_docker_keepalived_interface: eth0
+automated_docker_keepalived_vip: 192.168.1.1

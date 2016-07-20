@@ -50,6 +50,8 @@
       log_driver: "{{ automated_docker_run.log_driver | default(omit) }}"
       log_options: "{{ automated_docker_run.log_options | default(omit) }}"
       etc_hosts: "{{ automated_docker_run.etc_hosts | default(omit) }}"
+      network_mode: "{{ automated_docker_run.network_mode | default(omit) }}"
+      capabilities: "{{ automated_docker_run.capabilities | default(omit) }}"
       volumes_from: "{{ (automated_docker_run.upgrade is defined and automated_docker_run.upgrade) | ternary(automated_docker_container_stopped_name, omit) }}"
       state: present
     register: automated_docker_create_result

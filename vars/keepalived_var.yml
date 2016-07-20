@@ -1,0 +1,10 @@
+---
+automated_docker_container_default:
+  keepalived:
+    image: winggundamth/keepalived:trusty
+    name: keepalived
+    hostname: keepalived
+    volumes:
+      - /lib/modules:/lib/modules:ro
+    network_mode: host
+    capabilities: NET_ADMIN

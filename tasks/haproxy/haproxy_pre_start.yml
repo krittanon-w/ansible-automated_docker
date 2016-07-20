@@ -12,7 +12,7 @@
 
   - name: Create HAProxy configuration file
     template:
-      src: haproxy.cfg.j2
+      src: "{{ automated_docker_haproxy_template_file }}"
       dest: "{{ automated_docker_haproxy_host_tmp_config_path }}"
 
   - name: Copy HAProxy configuration file to container
