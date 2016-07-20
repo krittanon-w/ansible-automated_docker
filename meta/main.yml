@@ -14,4 +14,4 @@ galaxy_info:
     - configuration
     - container
 dependencies:
-  - { src: 'winggundamth.docker_machine', docker_machine_manage_config: true }
+  - { role: 'winggundamth.docker_machine', docker_machine_manage_config: true }

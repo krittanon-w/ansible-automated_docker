@@ -1,0 +1,11 @@
+---
+automated_docker_container_default:
+  haproxy:
+    image: haproxy:1.6.6-alpine
+    name: haproxy
+    hostname: haproxy
+    published_ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /usr/local/etc/haproxy

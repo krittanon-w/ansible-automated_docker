@@ -26,3 +26,24 @@
 - name: Reload nginx
   command: service nginx reload
   delegate_to: "{{ automated_docker_run.name }}"
+
+
+# Handlers for HAProxy container
+- name: Check HAProxy configuration and reload HAProxy
+  command: |
+    docker run --rm=true --name haproxy-syntax-check \
+    --volumes-from "{{ automated_docker_run.name }}"
+    "{{ automated_docker_run.image }}" \
+    haproxy -c -f "{{ automated_docker_haproxy_container_config_path }}"
+  environment: "{{ automated_docker_machine_environment | default({}) }}"
+  vars:
+    ansible_python_interpreter: python
+  notify: Reload HAProxy container
+
+- name: Reload HAProxy container
+  shell: |
+    docker start "{{ automated_docker_run.name }}" && \
+    docker kill -s HUP "{{ automated_docker_run.name }}"
+  environment: "{{ automated_docker_machine_environment | default({}) }}"
+  vars:
+    ansible_python_interpreter: python

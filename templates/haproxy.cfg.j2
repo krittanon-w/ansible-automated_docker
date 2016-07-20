@@ -1,0 +1,44 @@
+global
+        log 127.0.0.1 local0
+        log 127.0.0.1 local1 notice
+        maxconn 4096
+        tune.bufsize 384000
+        stats socket /var/run/haproxy.stat level admin mode 600
+
+defaults
+        log global
+        option dontlognull
+        option redispatch
+        retries 3
+        timeout client 50s
+        timeout connect 10s
+        timeout server 50s
+        maxconn 4096
+
+frontend nginx-test-front
+bind *:80
+    option httplog
+    option forwardfor except 127.0.0.0/8
+    option http-server-close
+    mode http
+    default_backend nginx-test-back
+
+backend nginx-test-back
+    mode http
+    balance source
+    {% for item in automated_docker_haproxy_backend %}
+    {% set entry = [] %}
+    {% set _ = entry.append("server") %}
+    {% set _ = entry.append(item.target.split('.')[0] | string) %}
+    {% set _ = entry.append(lookup('dig', item.target) | string) %}
+    {% set _ = entry.append("check") %}
+    {% set _ = entry.append("port") %}
+    {% set _ = entry.append(item.port | string) %}
+    {% set _ = entry.append("inter") %}
+    {% set _ = entry.append("12000") %}
+    {% set _ = entry.append("rise") %}
+    {% set _ = entry.append(automated_docker_haproxy_backend | count | string) %}
+    {% set _ = entry.append("fall") %}
+    {% set _ = entry.append(automated_docker_haproxy_backend | count | string) %}
+    {{ entry | join(' ') }}
+    {% endfor %}
