@@ -1,44 +1,68 @@
 global
-        log 127.0.0.1 local0
-        log 127.0.0.1 local1 notice
-        maxconn 4096
-        tune.bufsize 384000
-        stats socket /var/run/haproxy.stat level admin mode 600
+    log 127.0.0.1 local0
+    log 127.0.0.1 local1 notice
+    maxconn 4096
+    tune.bufsize 384000
+    tune.ssl.default-dh-param 2048
+
+    # https://cipherli.st/
+    ssl-default-bind-options no-sslv3 no-tls-tickets force-tlsv12
+    ssl-default-bind-ciphers AES128+EECDH:AES128+EDH
 
 defaults
-        log global
-        option dontlognull
-        option redispatch
-        retries 3
-        timeout client 50s
-        timeout connect 10s
-        timeout server 50s
-        maxconn 4096
+    log global
+    option dontlognull
+    option redispatch
+    retries 3
+    timeout client 50s
+    timeout connect 10s
+    timeout server 50s
+    maxconn 4096
 
-frontend nginx-test-front
-bind *:80
+listen stats
+    bind *:9000
+    mode http
+    stats enable
+    stats uri /
+    stats realm HAProxy\ Statistics
+    stats hide-version
+    stats auth {{ automated_docker_haproxy_stats_username }}:{{ automated_docker_haproxy_stats_password }}
+
+frontend {{ automated_docker_haproxy_service_name }}-http-front
+    bind *:80
+    reqadd X-Forwarded-Proto:\ http
+    mode http
     option httplog
     option forwardfor except 127.0.0.0/8
     option http-server-close
-    mode http
-    default_backend nginx-test-back
+    option httpclose
+{% if automated_docker_haproxy_virtual_hosts is defined %}
+    use_backend {{ automated_docker_haproxy_service_name }}-back if { hdr(Host) -i {{ automated_docker_haproxy_virtual_hosts | join(' ') }} }
+{% endif %}
+    default_backend {{ automated_docker_haproxy_service_name }}-back
 
-backend nginx-test-back
+{% if automated_docker_haproxy_ssl_certificate_pem_file is defined %}
+# https://cipherli.st/
+frontend {{ automated_docker_haproxy_service_name }}-https-front
+    bind *:443 ssl crt {{ automated_docker_haproxy_container_cert_path }}/{{ automated_docker_haproxy_ssl_certificate_pem_file }} ciphers AES128+EECDH:AES128+EDH force-tlsv12 no-sslv3
+    reqadd X-Forwarded-Proto:\ https
+    option tcplog
+    option http-server-close
+    option httpclose
+    #rspadd Strict-Transport-Security:\ max-age=31536000;\ includeSubDomains;\ preload
+    #rspadd X-Frame-Options:\ DENY
+{% if automated_docker_haproxy_virtual_hosts is defined %}
+    use_backend {{ automated_docker_haproxy_service_name }}-back if { hdr(Host) -i {{ automated_docker_haproxy_virtual_hosts | join(' ') }} }
+{% endif %}
+    default_backend {{ automated_docker_haproxy_service_name }}-back
+{% endif %}
+
+backend {{ automated_docker_haproxy_service_name }}-back
+{% if automated_docker_haproxy_ssl_certificate_pem_file is defined %}
+    redirect scheme https code 301 if !{ ssl_fc }
+{% endif %}
     mode http
-    balance source
-    {% for item in automated_docker_haproxy_backend %}
-    {% set entry = [] %}
-    {% set _ = entry.append("server") %}
-    {% set _ = entry.append(item.target.split('.')[0] | string) %}
-    {% set _ = entry.append(lookup('dig', item.target) | string) %}
-    {% set _ = entry.append("check") %}
-    {% set _ = entry.append("port") %}
-    {% set _ = entry.append(item.port | string) %}
-    {% set _ = entry.append("inter") %}
-    {% set _ = entry.append("12000") %}
-    {% set _ = entry.append("rise") %}
-    {% set _ = entry.append(automated_docker_haproxy_backend | count | string) %}
-    {% set _ = entry.append("fall") %}
-    {% set _ = entry.append(automated_docker_haproxy_backend | count | string) %}
-    {{ entry | join(' ') }}
-    {% endfor %}
+    balance {{ automated_docker_haproxy_balance }}
+{% for item in automated_docker_haproxy_backend %}
+    server {{ item.target.split('.')[0] }} {{ lookup('dig', item.target) }}:{{ item.port }} check port {{ item.port }} inter {{ automated_docker_haproxy_check_interval }} rise {{ automated_docker_haproxy_check_rise }} fall {{ automated_docker_haproxy_check_fall }}
+{% endfor %}

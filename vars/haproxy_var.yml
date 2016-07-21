@@ -4,8 +4,13 @@ automated_docker_container_default:
     image: haproxy:1.6.6-alpine
     name: haproxy
     hostname: haproxy
+    restart_policy: always
     published_ports:
       - "80:80"
       - "443:443"
+      - "9000:9000"
+    exposed_ports:
+      - "9000:9000"
     volumes:
       - /usr/local/etc/haproxy
+      - /etc/ssl
