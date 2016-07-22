@@ -1,5 +1,5 @@
 vrrp_instance {{ automated_docker_keepalived_instance }} {
-  state {{ (inventory_hostname.split('-')[-1] == '1') | ternary('MASTER', 'SLAVE') }}
+  state {{ (inventory_hostname.split('-')[-1] == '1') | ternary('MASTER', 'BACKUP') }}
   interface {{ automated_docker_keepalived_interface }}
   virtual_router_id 1
   priority 100
