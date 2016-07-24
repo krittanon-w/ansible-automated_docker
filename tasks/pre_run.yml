@@ -1,0 +1,4 @@
+---
+- name: Combine docker container variable
+  set_fact:
+    automated_docker_run: "{{ automated_docker_container_default[automated_docker_container.key] | combine(automated_docker_container.value) }}"

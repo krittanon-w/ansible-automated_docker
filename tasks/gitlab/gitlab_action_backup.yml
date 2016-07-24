@@ -1,0 +1,27 @@
+---
+- name: Pre-run tasks
+  include: ../pre_run.yml
+
+- name: Backup GitLab
+  docker_container:
+    name: "{{ automated_docker_run.name }}-backup"
+    image: "{{ automated_docker_run.image }}"
+    command: app:rake gitlab:backup:create
+    detach: false
+    links: "{{ automated_docker_run.links | default(omit) }}"
+    env:
+      GITLAB_SECRETS_DB_KEY_BASE: "{{ automated_docker_run.env.GITLAB_SECRETS_DB_KEY_BASE }}"
+      GITLAB_BACKUP_DIR: "{{ automated_docker_gitlab_action_backup_container_path }}"
+    volumes_from: "{{ automated_docker_run.name }}"
+    state: started
+
+- name: Copy backup file to target directory
+  command: |
+    docker cp \
+    "{{ automated_docker_run.name }}"-backup:"{{ automated_docker_gitlab_action_backup_container_path }}" \
+    "{{ automated_docker_gitlab_action_backup_target_path }}"/"{{ automated_docker_run.name }}"
+
+- name: Remove GitLab backup container
+  docker_container:
+    name: "{{ automated_docker_run.name }}-backup"
+    state: absent

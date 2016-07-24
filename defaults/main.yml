@@ -1,4 +1,7 @@
 ---
+#automated_docker_name: sample-image
+#autoamted_docker_action: backup
+automated_docker_action_custom_file_path: "{{ role_path }}/tasks/{{ automated_docker_name }}/{{ automated_docker_container.key }}_action_{{ automated_docker_action }}.yml"
 automated_docker_machine_storage_path: "{{ playbook_dir }}/files/docker-machine"
 automated_docker_cert_path: "{{ automated_docker_machine_storage_path }}/machines/{{ inventory_hostname }}"
 automated_docker_machine_environment_pre:
@@ -56,6 +59,9 @@ automated_docker_gitlab_registry_container_name: gitlab-registry
 automated_docker_gitlab_registry_key_file_path: "{{ role_path }}/files/gitlab/registry-auth.key"
 automated_docker_gitlab_registry_ssl_key_file_path: "{{ role_path }}/files/gitlab/registry-auth.key"
 automated_docker_gitlab_registry_ssl_crt_file_path: "{{ role_path }}/files/gitlab/registry-auth.crt"
+automated_docker_gitlab_action_backup_host_path: /tmp/gitlab-backups
+automated_docker_gitlab_action_backup_container_path: /backups
+automated_docker_gitlab_action_backup_target_path: "{{ playbook_dir }}"
 
 # Default variables for HAProxy
 automated_docker_haproxy_template_file: haproxy.cfg.j2
