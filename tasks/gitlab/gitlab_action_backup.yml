@@ -18,7 +18,7 @@
 - name: Copy backup file to target directory
   command: |
     docker cp \
-    "{{ automated_docker_gitlab_action_backup_container_name }}":"{{ automated_docker_gitlab_action_backup_container_path }}" \
+    "{{ automated_docker_gitlab_action_backup_container_name }}":"{{ automated_docker_gitlab_action_backup_container_path }}"/. \
     "{{ automated_docker_gitlab_action_backup_target_path }}"/"{{ automated_docker_run.name }}"
 
 - name: Remove GitLab backup container
