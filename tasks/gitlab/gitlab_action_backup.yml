@@ -35,20 +35,7 @@
       name: "{{ automated_docker_gitlab_action_backup_swift_utilities_container_name }}"
       image: "{{ automated_docker_gitlab_action_backup_swift_utilities_image }}"
       command: sleep 9999
-      env:
-        CINDER_ENDPOINT_TYPE: "{{ lookup('env','CINDER_ENDPOINT_TYPE') | default(omit) }}"
-        NOVA_ENDPOINT_TYPE: "{{ lookup('env','NOVA_ENDPOINT_TYPE') | default(omit) }}"
-        OS_ENDPOINT_TYPE: "{{ lookup('env','OS_ENDPOINT_TYPE') | default(omit) }}"
-        OS_USERNAME: "{{ lookup('env','OS_USERNAME') | default(omit) }}"
-        OS_PASSWORD: "{{ lookup('env','OS_PASSWORD') | default(omit) }}"
-        OS_PROJECT_NAME: "{{ lookup('env','OS_PROJECT_NAME') | default(omit) }}"
-        OS_TENANT_NAME: "{{ lookup('env','OS_TENANT_NAME') | default(omit) }}"
-        OS_AUTH_URL: "{{ lookup('env','OS_AUTH_URL') | default(omit) }}"
-        OS_NO_CACHE: "{{ lookup('env','OS_NO_CACHE') | default(omit) }}"
-        OS_USER_DOMAIN_NAME: "{{ lookup('env','OS_USER_DOMAIN_NAME') | default(omit) }}"
-        OS_PROJECT_DOMAIN_NAME: "{{ lookup('env','OS_PROJECT_DOMAIN_NAME') | default(omit) }}"
-        OS_IDENTITY_API_VERSION: "{{ lookup('env','OS_IDENTITY_API_VERSION') | default(omit) }}"
-        OS_AUTH_VERSION: "{{ lookup('env','OS_AUTH_VERSION') | default(omit) }}"
+      env: "{{ automated_docker_openstack_environment }}"
       volumes_from: "{{ automated_docker_gitlab_action_backup_container_name }}"
       state: started
     when: automated_docker_gitlab_action_backup_to_swift
