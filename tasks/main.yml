@@ -24,7 +24,7 @@
   environment: "{{ automated_docker_machine_environment | default({}) }}"
   with_dict: "{{ hostvars[inventory_hostname]['automated_docker_container_' + automated_docker_name] | default(automated_docker_container_default) }}"
   when: |
-    automated_docker_container.value.links is not defined and
+    automated_docker_container.value.links is defined and
     automated_docker_action is not defined
   loop_control:
     loop_var: automated_docker_container

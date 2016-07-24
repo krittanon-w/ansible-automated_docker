@@ -62,6 +62,9 @@ automated_docker_gitlab_registry_ssl_crt_file_path: "{{ role_path }}/files/gitla
 automated_docker_gitlab_action_backup_host_path: /tmp/gitlab-backups
 automated_docker_gitlab_action_backup_container_path: /backups
 automated_docker_gitlab_action_backup_target_path: "{{ playbook_dir }}"
+automated_docker_gitlab_action_backup_container_name: "{{ automated_docker_run.name }}-backup"
+automated_docker_gitlab_action_restore_container_name: "{{ automated_docker_run.name }}-restore"
+#automated_docker_gitlab_action_restore_file_path: "{{ playbook_dir }}/gitlab-container/1469319388_gitlab_backup.tar"
 
 # Default variables for HAProxy
 automated_docker_haproxy_template_file: haproxy.cfg.j2
