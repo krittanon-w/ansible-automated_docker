@@ -70,7 +70,12 @@
     docker_container:
       name: "{{ automated_docker_gitlab_action_restore_container_name }}"
       image: "{{ automated_docker_run.image }}"
-      command: app:rake gitlab:backup:restore force=yes BACKUP="{{ automated_docker_gitlab_action_restore_file_name.split('_')[0] }}"
+      # Patch for gitlab 8.10.0 until this get fixed in 8.10.1
+      # https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5459
+      entrypoint: "sh -c '
+        wget -O /home/git/gitlab/lib/backup/repository.rb
+        https://gitlab.com/gitlab-org/gitlab-ce/raw/8469f9e0ed0b700ba35d0c8af284b387172e2335/lib/backup/repository.rb &&
+        /sbin/entrypoint.sh app:rake gitlab:backup:restore force=yes BACKUP={{ automated_docker_gitlab_action_restore_file_name.split('_')[0] }}'"
       links: "{{ automated_docker_run.links | default(omit) }}"
       env:
         GITLAB_SECRETS_DB_KEY_BASE: "{{ automated_docker_run.env.GITLAB_SECRETS_DB_KEY_BASE }}"
