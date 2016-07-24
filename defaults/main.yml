@@ -51,6 +51,7 @@ automated_docker_registry_host_auth_token_rootcertbundle_file_path: "{{ role_pat
 automated_docker_registry_config_example_url: https://raw.githubusercontent.com/docker/distribution-library-image/v2.4.1/registry/config-example.yml
 automated_docker_registry_config_example_tmp_path: /tmp/docker-registry-config-example.yml
 
+
 # Default variables for GitLab
 automated_docker_gitlab_container_name: gitlab
 automated_docker_gitlab_postgresql_container_name: gitlab-postgresql
@@ -59,12 +60,25 @@ automated_docker_gitlab_registry_container_name: gitlab-registry
 automated_docker_gitlab_registry_key_file_path: "{{ role_path }}/files/gitlab/registry-auth.key"
 automated_docker_gitlab_registry_ssl_key_file_path: "{{ role_path }}/files/gitlab/registry-auth.key"
 automated_docker_gitlab_registry_ssl_crt_file_path: "{{ role_path }}/files/gitlab/registry-auth.crt"
+
+# Default variables for GitLab Backup Action
 automated_docker_gitlab_action_backup_host_path: /tmp/gitlab-backups
 automated_docker_gitlab_action_backup_container_path: /backups
-automated_docker_gitlab_action_backup_target_path: "{{ playbook_dir }}"
 automated_docker_gitlab_action_backup_container_name: "{{ automated_docker_run.name }}-backup"
+# Upload backup file to host where run Ansible
+automated_docker_gitlab_action_backup_to_host: false
+automated_docker_gitlab_action_backup_target_path: "{{ playbook_dir }}"
+# Upload backup file to Swift
+automated_docker_gitlab_action_backup_to_swift: false
+automated_docker_gitlab_action_backup_swift_utilities_image: winggundamth/utilities:xenial
+automated_docker_gitlab_action_backup_swift_utilities_container_name: "{{ automated_docker_run.name }}-utilities"
+automated_docker_gitlab_action_backup_swift_container_name: backups
+automated_docker_gitlab_action_backup_swift_folder: gitlab
+
+# Default variables for GitLab Restore Action
 automated_docker_gitlab_action_restore_container_name: "{{ automated_docker_run.name }}-restore"
 #automated_docker_gitlab_action_restore_file_path: "{{ playbook_dir }}/gitlab-container/1469319388_gitlab_backup.tar"
+
 
 # Default variables for HAProxy
 automated_docker_haproxy_template_file: haproxy.cfg.j2

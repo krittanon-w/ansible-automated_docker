@@ -2,6 +2,8 @@
 - name: Pre-run tasks
   include: ../pre_run.yml
 
+# TODO Improve to support directory backup path and pick the latest backup file
+
 - name: Check backup file if exists
   stat:
     path: "{{ automated_docker_gitlab_action_restore_file_path }}"
