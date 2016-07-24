@@ -12,6 +12,8 @@ automated_docker_container_default:
       - "12900:12900"
       - "12201:12201"
       - "12201:12201/udp"
+      # Need to use 5140 inside because graylog run with normal user that
+      # can not expose port less then 1024
       - "514:5140"
       - "514:5140/udp"
     exposed_ports:
@@ -27,7 +29,7 @@ automated_docker_container_default:
     image: elasticsearch:2.3.4
     name: "{{ automated_docker_graylog_elasticsearch_container_name }}"
     hostname: "{{ automated_docker_graylog_elasticsearch_container_name }}"
-    command: elasticsearch -Des.node.name="{{ automated_docker_graylog_elasticsearch_cluster_name }}"
+    command: elasticsearch -Des.cluster.name="{{ automated_docker_graylog_elasticsearch_cluster_name }}"
     env:
       ES_HEAP_SIZE: 512m
     # published_ports:

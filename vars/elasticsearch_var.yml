@@ -4,7 +4,7 @@ automated_docker_container_default:
     image: elasticsearch:2.3.4
     name: elasticsearch
     hostname: elasticsearch
-    command: elasticsearch -Des.node.name="{{ automated_docker_elasticsearch_cluster_name }}"
+    command: elasticsearch -Des.cluster.name="{{ automated_docker_elasticsearch_cluster_name }}"
     volumes:
       - /usr/share/elasticsearch/config
       - /usr/share/elasticsearch/data
