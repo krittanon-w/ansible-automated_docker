@@ -25,6 +25,9 @@ automated_docker_openstack_environment:
   OS_IDENTITY_API_VERSION: "{{ lookup('env','OS_IDENTITY_API_VERSION') | default(omit) }}"
   OS_AUTH_VERSION: "{{ lookup('env','OS_AUTH_VERSION') | default(omit) }}"
 
+automated_docker_utilities_image: winggundamth/utilities:xenial
+automated_docker_utilities_container_name: "{{ automated_docker_run.name }}-utilities"
+
 # Default docker run variables
 automated_docker_container_default_pull: no
 automated_docker_container_default_restart_policy: unless-stopped
@@ -35,11 +38,13 @@ automated_docker_container_default_recreate: no
 # Until this PR has been implemented
 # https://github.com/ansible/proposals/pull/21
 
+
 # Default variables for Nginx
 automated_docker_nginx_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/nginx.conf"
 automated_docker_nginx_host_config_file_paths: []
 automated_docker_nginx_config_path: /etc/nginx
 automated_docker_nginx_config_backup_path: /etc/nginx.bak
+
 
 # Default variables for Graylog
 automated_docker_graylog_container_name: graylog
@@ -47,9 +52,11 @@ automated_docker_graylog_mongo_container_name: graylog-mongo
 automated_docker_graylog_elasticsearch_container_name: graylog-elasticsearch
 automated_docker_graylog_elasticsearch_cluster_name: graylog
 
+
 # Default variables for MariaDB
 automated_docker_mariadb_backup_file:
 automated_docker_mariadb_container_backup_file: /tmp/backup.sql
+
 
 # Default variables for Etherpad
 automated_docker_etherpad_container_name: etherpad
@@ -57,6 +64,7 @@ automated_docker_etherpad_mariadb_container_name: etherpad-mariadb
 automated_docker_etherpad_mariadb_container_username: etherpad
 automated_docker_etherpad_mariadb_container_password: CHANGEME
 automated_docker_etherpad_mariadb_container_dbname: etherpad
+
 
 # Default variables for Docker Registry
 automated_docker_registry_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/config.yml"
@@ -85,8 +93,8 @@ automated_docker_gitlab_action_backup_to_host: false
 automated_docker_gitlab_action_backup_target_path: "{{ playbook_dir }}"
 # Upload backup file to Swift
 automated_docker_gitlab_action_backup_to_swift: false
-automated_docker_gitlab_action_backup_swift_utilities_image: winggundamth/utilities:xenial
-automated_docker_gitlab_action_backup_swift_utilities_container_name: "{{ automated_docker_run.name }}-utilities"
+automated_docker_gitlab_action_backup_swift_utilities_image: "{{ automated_docker_utilities_image }}"
+automated_docker_gitlab_action_backup_swift_utilities_container_name: "{{ automated_docker_utilities_container_name }}"
 automated_docker_gitlab_action_backup_swift_container_name: backups
 automated_docker_gitlab_action_backup_swift_folder: gitlab
 
@@ -118,6 +126,7 @@ automated_docker_haproxy_ssl_certificate_paths: []
 #automated_docker_haproxy_service_name: service-test
 #automated_docker_haproxy_domain_name: example.org
 
+
 # Default variables for Keepalived
 automated_docker_keepalived_template_file: keepalived.conf.j2
 automated_docker_keepalived_host_tmp_config_path: /tmp/container-keepalived.conf
@@ -126,3 +135,9 @@ automated_docker_keepalived_instance: haproxy-test
 automated_docker_keepalived_auth_pass: CHANGEME
 automated_docker_keepalived_interface: eth0
 automated_docker_keepalived_vip: 192.168.1.1
+
+
+# Default variables for Jenkins
+automated_docker_jenkins_utilities_image: "{{ automated_docker_utilities_image }}"
+automated_docker_jenkins_utilities_container_name: "{{ automated_docker_utilities_container_name }}"
+automated_docker_jenkins_home_path: /var/jenkins_home

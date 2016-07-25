@@ -1,0 +1,39 @@
+---
+# NOTE Need to use docker command because jenkins container doesn't has python installed
+# TODO Use utilities container instead of docker command
+
+- name: Start utilities container
+  docker_container:
+    name: "{{ automated_docker_jenkins_utilities_container_name }}"
+    image: "{{ automated_docker_jenkins_utilities_image }}"
+    command: sleep 99999
+    links:
+      - "{{ automated_docker_run.name }}:jenkins"
+    volumes_from: "{{ automated_docker_run.name }}"
+    state: started
+
+- name: Add utilities container to inventory
+  add_host:
+    name: "{{ automated_docker_jenkins_utilities_container_name }}"
+    groups: automated_docker_jenkins_utilities_containers
+    ansible_connection: docker
+    ansible_user: root
+    ansible_docker_extra_args: "{{ automated_docker_extra_args | default(omit) }}"
+
+- name: Wait until Jenkins completely started
+  wait_for:
+    path: "{{ automated_docker_jenkins_home_path }}/jenkins.install.UpgradeWizard.state"
+  delegate_to: "{{ automated_docker_jenkins_utilities_container_name }}"
+
+- name: Unlock Jenkins
+  command: "cp
+    {{ automated_docker_jenkins_home_path }}/jenkins.install.UpgradeWizard.state
+    {{ automated_docker_jenkins_home_path }}/jenkins.install.InstallUtil.lastExecVersion"
+  delegate_to: "{{ automated_docker_jenkins_utilities_container_name }}"
+  notify: Restart container
+
+- name: Remove utilities container
+  docker_container:
+    name: "{{ automated_docker_jenkins_utilities_container_name }}"
+    force_kill: yes
+    state: absent
