@@ -11,7 +11,7 @@
   - name: Wait until Jenkins completely started
     raw: "NEXT_WAIT_TIME=0;
       until {{ automated_docker_jenkins_test_start_command }} ||
-      [ $(( NEXT_WAIT_TIME++ )) -eq 60 ];
+      [ $(( NEXT_WAIT_TIME++ )) -eq 20 ];
       do sleep 1; done &&
       {{ automated_docker_jenkins_test_start_command }}"
     delegate_to: "{{ automated_docker_run.name }}"
@@ -30,6 +30,59 @@
       {{ automated_docker_jenkins_install_plugins | join(' ') }}"
     delegate_to: "{{ automated_docker_run.name }}"
 
+- block: # Check and register for jenkins configuration file
+
+  - name: Set list of path to look for jenkins configuration file
+    set_fact:
+      automated_docker_jenkins_host_config_file_paths: "{{ automated_docker_jenkins_host_config_file_paths }} + [ '{{ automated_docker_jenkins_host_config_file_path }}' ]"
+    with_items: "{{ group_names }}"
+
+  - name: Check if jenkins configuration file is exists
+    stat:
+      path: "{{ item }}"
+    register: automated_docker_jenkins_config_check
+    with_first_found:
+      - files: "{{ automated_docker_jenkins_host_config_file_paths }}"
+        skip: true
+  - name: Set jenkins configuration file path
+    set_fact:
+      automated_docker_jenkins_config_stat: "{{ automated_docker_jenkins_config_check.results[0].stat }}"
+    when: automated_docker_jenkins_config_check.results[0].stat is defined
+
+- block: # Copy jenkins configuration file
+
+  - name: Create jenkins configuration file
+    template:
+      src: "{{ automated_docker_jenkins_config_stat.path }}"
+      dest: "{{ automated_docker_jenkins_host_tmp_config_path }}"
+    when: |
+      automated_docker_jenkins_config_stat is defined and
+      automated_docker_jenkins_config_stat.exists
+
+  - name: Copy jenkins configuration
+    command: |
+      docker cp "{{ automated_docker_jenkins_host_tmp_config_path }}" \
+      "{{ automated_docker_run.name }}":"{{ automated_docker_jenkins_container_config_file_path }}"
+    when: |
+      automated_docker_jenkins_config_stat is defined and
+      automated_docker_jenkins_config_stat.exists
+
+  - name: Change owner of configuration file
+    raw: "chown jenkins:jenkins
+      {{ automated_docker_jenkins_container_config_file_path }}"
+    delegate_to: "{{ automated_docker_run.name }}"
+    when: |
+      automated_docker_jenkins_config_stat is defined and
+      automated_docker_jenkins_config_stat.exists
+
+  - name: Remove temporary jenkins configuration file
+    file:
+      path: "{{ automated_docker_jenkins_host_tmp_config_path }}"
+      state: absent
+    when: |
+      automated_docker_jenkins_config_stat is defined and
+      automated_docker_jenkins_config_stat.exists
+
 - block: # Set admin pasword
 
   # NOTE There is no good way to generate jbcrypt from command line
@@ -40,12 +93,14 @@
       sha256sum"
     register: automated_docker_jenkins_admin_password_sha256
     delegate_to: "{{ automated_docker_run.name }}"
+    when: automated_docker_jenkins_admin_username == 'admin'
 
   - name: Change admin password
     raw: "sed -i
       's#passwordHash.*#passwordHash>{{ automated_docker_jenkins_admin_password_salt }}:{{ automated_docker_jenkins_admin_password_sha256.stdout.split(' ')[0] }}</passwordHash>#g'
       {{ automated_docker_jenkins_home_path }}/users/admin/config.xml"
     delegate_to: "{{ automated_docker_run.name }}"
+    when: automated_docker_jenkins_admin_username == 'admin'
 
 - block: # Safe restart Jenkins
 
@@ -60,7 +115,6 @@
   - name: Wait until Jenkins completely restarted
     raw: "sleep 10; NEXT_WAIT_TIME=0;
       until {{ automated_docker_jenkins_test_start_command }} ||
-      [ $(( NEXT_WAIT_TIME++ )) -eq 60 ];
-      do sleep 1; done &&
-      {{ automated_docker_jenkins_test_start_command }}"
+      [ $(( NEXT_WAIT_TIME++ )) -eq 5 ];
+      do sleep 1; done"
     delegate_to: "{{ automated_docker_run.name }}"

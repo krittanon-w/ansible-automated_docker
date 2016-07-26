@@ -146,12 +146,17 @@ automated_docker_jenkins_unlock_file_path: "{{ automated_docker_jenkins_home_pat
 automated_docker_jenkins_cli_path: "{{ automated_docker_jenkins_home_path }}/war/WEB-INF/jenkins-cli.jar"
 automated_docker_jenkins_cli_command: java -jar {{ automated_docker_jenkins_cli_path }} -s http://127.0.0.1:8080
 automated_docker_jenkins_cli_password_parameter: "--password-file {{ automated_docker_jenkins_home_path }}/secrets/initialAdminPassword"
-automated_docker_jenkins_cli_authen_parameter: "--username admin {{ automated_docker_jenkins_cli_password_parameter }}"
+automated_docker_jenkins_cli_authen_parameter: "--username {{ automated_docker_jenkins_admin_username }} {{ automated_docker_jenkins_cli_password_parameter }}"
 automated_docker_jenkins_test_start_command: "{{ automated_docker_jenkins_cli_command }} login {{ automated_docker_jenkins_cli_authen_parameter }}"
 automated_docker_jenkins_install_plugins:
   - workflow-aggregator
   - git
+automated_docker_jenkins_admin_username: admin
 automated_docker_jenkins_admin_password_salt: JENKINS
 automated_docker_jenkins_admin_password: CHANGEME
 # Use when changing password only
 # automated_docker_jenkins_old_admin_password: CHANGEME
+automated_docker_jenkins_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/config.xml"
+automated_docker_jenkins_host_config_file_paths: []
+automated_docker_jenkins_container_config_file_path: "{{ automated_docker_jenkins_home_path }}/config.xml"
+automated_docker_jenkins_host_tmp_config_path: /tmp/container-jenkins.xml
