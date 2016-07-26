@@ -1,39 +1,66 @@
 ---
 # NOTE Need to use docker command because jenkins container doesn't has python installed
-# TODO Use utilities container instead of docker command
 
-- name: Start utilities container
-  docker_container:
-    name: "{{ automated_docker_jenkins_utilities_container_name }}"
-    image: "{{ automated_docker_jenkins_utilities_image }}"
-    command: sleep 99999
-    links:
-      - "{{ automated_docker_run.name }}:jenkins"
-    volumes_from: "{{ automated_docker_run.name }}"
-    state: started
+- block: # Unlock Jenkins
 
-- name: Add utilities container to inventory
-  add_host:
-    name: "{{ automated_docker_jenkins_utilities_container_name }}"
-    groups: automated_docker_jenkins_utilities_containers
-    ansible_connection: docker
-    ansible_user: root
-    ansible_docker_extra_args: "{{ automated_docker_extra_args | default(omit) }}"
+  - name: Set Jenkins credentials
+    set_fact:
+      automated_docker_jenkins_cli_password_parameter: "--password {{ automated_docker_jenkins_old_admin_password | default(automated_docker_jenkins_admin_password) }}"
+    when: not automated_docker_create_result.changed
 
-- name: Wait until Jenkins completely started
-  wait_for:
-    path: "{{ automated_docker_jenkins_home_path }}/jenkins.install.UpgradeWizard.state"
-  delegate_to: "{{ automated_docker_jenkins_utilities_container_name }}"
+  - name: Wait until Jenkins completely started
+    raw: "NEXT_WAIT_TIME=0;
+      until {{ automated_docker_jenkins_test_start_command }} ||
+      [ $(( NEXT_WAIT_TIME++ )) -eq 60 ];
+      do sleep 1; done &&
+      {{ automated_docker_jenkins_test_start_command }}"
+    delegate_to: "{{ automated_docker_run.name }}"
 
-- name: Unlock Jenkins
-  command: "cp
-    {{ automated_docker_jenkins_home_path }}/jenkins.install.UpgradeWizard.state
-    {{ automated_docker_jenkins_home_path }}/jenkins.install.InstallUtil.lastExecVersion"
-  delegate_to: "{{ automated_docker_jenkins_utilities_container_name }}"
-  notify: Restart container
+  - name: Unlock Jenkins
+    raw: "cp
+      {{ automated_docker_jenkins_check_file_path }}
+      {{ automated_docker_jenkins_unlock_file_path }} &&
+      chown jenkins:jenkins {{ automated_docker_jenkins_unlock_file_path }}"
+    delegate_to: "{{ automated_docker_run.name }}"
 
-- name: Remove utilities container
-  docker_container:
-    name: "{{ automated_docker_jenkins_utilities_container_name }}"
-    force_kill: yes
-    state: absent
+- block: # Install Jenkins plugins
+
+  - name: Install Jenkins plugins
+    raw: "{{ automated_docker_jenkins_cli_command }} install-plugin
+      {{ automated_docker_jenkins_install_plugins | join(' ') }}"
+    delegate_to: "{{ automated_docker_run.name }}"
+
+- block: # Set admin pasword
+
+  # NOTE There is no good way to generate jbcrypt from command line
+  # so it need to use sha256 for now
+  - name: Get sha256 hash password
+    raw: "echo -n
+      '{{ automated_docker_jenkins_admin_password }}{{ '{' }}{{ automated_docker_jenkins_admin_password_salt }}{{ '}' }}' |
+      sha256sum"
+    register: automated_docker_jenkins_admin_password_sha256
+    delegate_to: "{{ automated_docker_run.name }}"
+
+  - name: Change admin password
+    raw: "sed -i
+      's#passwordHash.*#passwordHash>{{ automated_docker_jenkins_admin_password_salt }}:{{ automated_docker_jenkins_admin_password_sha256.stdout.split(' ')[0] }}</passwordHash>#g'
+      {{ automated_docker_jenkins_home_path }}/users/admin/config.xml"
+    delegate_to: "{{ automated_docker_run.name }}"
+
+- block: # Safe restart Jenkins
+
+  - name: Restart Jenkins
+    raw: "{{ automated_docker_jenkins_cli_command }} safe-restart"
+    delegate_to: "{{ automated_docker_run.name }}"
+
+  - name: Set Jenkins credentials
+    set_fact:
+      automated_docker_jenkins_cli_password_parameter: "--password {{ automated_docker_jenkins_admin_password }}"
+
+  - name: Wait until Jenkins completely restarted
+    raw: "sleep 10; NEXT_WAIT_TIME=0;
+      until {{ automated_docker_jenkins_test_start_command }} ||
+      [ $(( NEXT_WAIT_TIME++ )) -eq 60 ];
+      do sleep 1; done &&
+      {{ automated_docker_jenkins_test_start_command }}"
+    delegate_to: "{{ automated_docker_run.name }}"
