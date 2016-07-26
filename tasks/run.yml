@@ -25,7 +25,7 @@
   # TODO Until these has been fixed
   # https://github.com/ansible/ansible-modules-core/issues/4116
   # https://github.com/ansible/ansible/issues/7367
-  - name: Work around to fix problem on Docker for Mac public beta
+  - name: Work around to fix problem on Docker for Mac public beta (Maybe take sometimes from pulling docker image)
     command: "docker run --rm=true {{ automated_docker_run.image }} true"
     when: ansible_system == 'Darwin'
 
