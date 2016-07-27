@@ -160,3 +160,6 @@ automated_docker_jenkins_host_config_file_path: "{{ playbook_dir }}/files/groups
 automated_docker_jenkins_host_config_file_paths: []
 automated_docker_jenkins_container_config_file_path: "{{ automated_docker_jenkins_home_path }}/config.xml"
 automated_docker_jenkins_host_tmp_config_path: /tmp/container-jenkins.xml
+automated_docker_jenkins_docker_version: 1.11.2
+automated_docker_jenkins_docker_client_url: "https://get.docker.com/builds/Linux/x86_64/docker-{{ automated_docker_jenkins_docker_version }}.tgz"
+automated_docker_jenkins_docker_bin_path: /usr/local/bin

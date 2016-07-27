@@ -83,6 +83,18 @@
       automated_docker_jenkins_config_stat is defined and
       automated_docker_jenkins_config_stat.exists
 
+- block: # Install Docker Client
+
+  - name: Download Docker client
+    raw: "docker version | grep {{ automated_docker_jenkins_docker_version }} ||
+      curl -o {{ automated_docker_jenkins_docker_client_url | basename }}
+        {{ automated_docker_jenkins_docker_client_url }} &&
+      tar xvfz {{ automated_docker_jenkins_docker_client_url | basename }} &&
+      mv docker/* {{ automated_docker_jenkins_docker_bin_path }}/ &&
+      rm -rf docker {{ automated_docker_jenkins_docker_client_url | basename }}"
+    delegate_to: "{{ automated_docker_run.name }}"
+    when: "'docker-plugin' in automated_docker_jenkins_install_plugins"
+
 - block: # Set admin pasword
 
   # NOTE There is no good way to generate jbcrypt from command line
