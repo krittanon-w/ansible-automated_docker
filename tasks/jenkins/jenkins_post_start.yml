@@ -19,9 +19,10 @@
   - name: Unlock Jenkins
     raw: "cp
       {{ automated_docker_jenkins_check_file_path }}
-      {{ automated_docker_jenkins_unlock_file_path }} &&
-      chown jenkins:jenkins {{ automated_docker_jenkins_unlock_file_path }}"
+      {{ automated_docker_jenkins_unlock_file_path }}"
     delegate_to: "{{ automated_docker_run.name }}"
+    vars:
+      ansible_user: jenkins
 
 - block: # Install Jenkins plugins
 
@@ -30,70 +31,48 @@
       {{ automated_docker_jenkins_install_plugins | join(' ') }}"
     delegate_to: "{{ automated_docker_run.name }}"
 
-- block: # Check and register for jenkins configuration file
-
-  - name: Set list of path to look for jenkins configuration file
-    set_fact:
-      automated_docker_jenkins_host_config_file_paths: "{{ automated_docker_jenkins_host_config_file_paths }} + [ '{{ automated_docker_jenkins_host_config_file_path }}' ]"
-    with_items: "{{ group_names }}"
-
-  - name: Check if jenkins configuration file is exists
-    stat:
-      path: "{{ item }}"
-    register: automated_docker_jenkins_config_check
-    with_first_found:
-      - files: "{{ automated_docker_jenkins_host_config_file_paths }}"
-        skip: true
-  - name: Set jenkins configuration file path
-    set_fact:
-      automated_docker_jenkins_config_stat: "{{ automated_docker_jenkins_config_check.results[0].stat }}"
-    when: automated_docker_jenkins_config_check.results[0].stat is defined
-
-- block: # Copy jenkins configuration file
-
-  - name: Create jenkins configuration file
-    template:
-      src: "{{ automated_docker_jenkins_config_stat.path }}"
-      dest: "{{ automated_docker_jenkins_host_tmp_config_path }}"
-    when: |
-      automated_docker_jenkins_config_stat is defined and
-      automated_docker_jenkins_config_stat.exists
-
-  - name: Copy jenkins configuration
-    command: |
-      docker cp "{{ automated_docker_jenkins_host_tmp_config_path }}" \
-      "{{ automated_docker_run.name }}":"{{ automated_docker_jenkins_container_config_file_path }}"
-    when: |
-      automated_docker_jenkins_config_stat is defined and
-      automated_docker_jenkins_config_stat.exists
-
-  - name: Change owner of configuration file
-    raw: "chown jenkins:jenkins
-      {{ automated_docker_jenkins_container_config_file_path }}"
-    delegate_to: "{{ automated_docker_run.name }}"
-    when: |
-      automated_docker_jenkins_config_stat is defined and
-      automated_docker_jenkins_config_stat.exists
-
-  - name: Remove temporary jenkins configuration file
-    file:
-      path: "{{ automated_docker_jenkins_host_tmp_config_path }}"
-      state: absent
-    when: |
-      automated_docker_jenkins_config_stat is defined and
-      automated_docker_jenkins_config_stat.exists
-
-- block: # Install Docker Client
+- block: # Configure docker-plugin
 
   - name: Download Docker client
     raw: "docker version | grep {{ automated_docker_jenkins_docker_version }} ||
-      curl -o {{ automated_docker_jenkins_docker_client_url | basename }}
+      (curl -o {{ automated_docker_jenkins_docker_client_url | basename }}
         {{ automated_docker_jenkins_docker_client_url }} &&
       tar xvfz {{ automated_docker_jenkins_docker_client_url | basename }} &&
       mv docker/* {{ automated_docker_jenkins_docker_bin_path }}/ &&
-      rm -rf docker {{ automated_docker_jenkins_docker_client_url | basename }}"
+      rm -rf docker {{ automated_docker_jenkins_docker_client_url | basename }})"
     delegate_to: "{{ automated_docker_run.name }}"
     when: "'docker-plugin' in automated_docker_jenkins_install_plugins"
+
+  - name: Check if can run docker command
+    raw: "docker version &> /dev/null && echo yes || echo no"
+    register: automated_docker_jenkins_can_do_docker
+    delegate_to: "{{ automated_docker_run.name }}"
+    vars:
+      ansible_user: jenkins
+    when: "'docker-plugin' in automated_docker_jenkins_install_plugins"
+
+  - name: Add jenkins user to the same group as docker socket
+    raw: "(test -e {{ automated_docker_jenkins_docker_socket_path }} &&
+      adduser jenkins $(stat -c %G /var/run/docker.sock)) &&
+      echo yes || echo no"
+    register: automated_docker_jenkins_can_do_docker
+    delegate_to: "{{ automated_docker_run.name }}"
+    when: |
+      "'docker-plugin' in automated_docker_jenkins_install_plugins and
+      automated_docker_jenkins_can_do_docker.stdout_lines[0] == 'no'"
+
+- block: # Copy SSH key
+
+  - name: Copy SSH key
+    include: jenkins_post_start_ssh.yml
+
+- block: # Build jenkins configuration file
+
+  - name: Build each jenkins configuration file
+    include: jenkins_post_start_build_config.yml
+    with_items: "{{ automated_docker_jenkins_config_files_list }}"
+    loop_control:
+      loop_var: automated_docker_jenkins_config_filename
 
 - block: # Set admin pasword
 
@@ -116,9 +95,11 @@
 
 - block: # Safe restart Jenkins
 
-  - name: Restart Jenkins
-    raw: "{{ automated_docker_jenkins_cli_command }} safe-restart"
-    delegate_to: "{{ automated_docker_run.name }}"
+  - name: Restart jenkins container
+    docker_container:
+      name: "{{ automated_docker_run.name }}"
+      restart: true
+      state: started
 
   - name: Set Jenkins credentials
     set_fact:

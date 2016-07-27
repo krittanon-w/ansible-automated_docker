@@ -156,10 +156,31 @@ automated_docker_jenkins_admin_password_salt: JENKINS
 automated_docker_jenkins_admin_password: CHANGEME
 # Use when changing password only
 # automated_docker_jenkins_old_admin_password: CHANGEME
-automated_docker_jenkins_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/config.xml"
+
+# Jenkins config file configuration
+automated_docker_jenkins_config_files_list:
+  - config.xml
+  - credentials.xml
+automated_docker_jenkins_host_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/{{ automated_docker_jenkins_config_filename }}"
 automated_docker_jenkins_host_config_file_paths: []
-automated_docker_jenkins_container_config_file_path: "{{ automated_docker_jenkins_home_path }}/config.xml"
-automated_docker_jenkins_host_tmp_config_path: /tmp/container-jenkins.xml
+automated_docker_jenkins_container_config_file_path: "{{ automated_docker_jenkins_home_path }}/{{ automated_docker_jenkins_config_filename }}"
+automated_docker_jenkins_host_tmp_config_path: "/tmp/container-jenkins-{{ automated_docker_jenkins_config_filename }}"
+
+# Jenkins ssh key configuration
+automated_docker_jenkins_host_sshkey_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/id_rsa"
+automated_docker_jenkins_host_sshkey_paths: []
+automated_docker_jenkins_container_sshkey_path: "{{ automated_docker_jenkins_home_path }}/.ssh/id_rsa"
+
+# Jenkins Docker configuration
 automated_docker_jenkins_docker_version: 1.11.2
 automated_docker_jenkins_docker_client_url: "https://get.docker.com/builds/Linux/x86_64/docker-{{ automated_docker_jenkins_docker_version }}.tgz"
 automated_docker_jenkins_docker_bin_path: /usr/local/bin
+automated_docker_jenkins_docker_socket_path: /var/run/docker.sock
+automated_docker_jenkins_home: /var/jenkins_home
+automated_docker_jenkins_ssh_key_file_path: "{{ automated_docker_jenkins_home }}/.ssh/id_rsa"
+automated_docker_jenkins_ssh_key_host_path: "{{ playbook_dir }}/files/groups/{{ group_names[0] }}/jenkins/ssh"
+automated_docker_jenkins_credential_master_name: jenkins-ssh-master
+automated_docker_jenkins_slave_cloud_name: Jenkin Master
+automated_docker_jenkins_slave_cloud_label: all
+automated_docker_jenkins_slave_cloud_docker_image: winggundamth/ubuntu-jenkins-slave
+automated_docker_jenkins_slave_cloud_server_url: unix:///var/run/docker.sock
