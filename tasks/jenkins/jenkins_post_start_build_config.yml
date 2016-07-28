@@ -1,4 +1,6 @@
 ---
+# TODO Use template files from templates role and use .j2 instead
+
 - block: # Check and register for jenkins configuration file
 
   - name: Reset variable
