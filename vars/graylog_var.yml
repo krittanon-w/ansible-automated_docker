@@ -36,7 +36,7 @@ automated_docker_container_default:
     #   - "9200:9200"
     #   - "9300:9300"
   mongo:
-    image: mongo:3.3.9
+    image: mongo:3.3.10
     name: "{{ automated_docker_graylog_mongo_container_name }}"
     hostname: "{{ automated_docker_graylog_mongo_container_name }}"
     # published_ports:

@@ -1,7 +1,7 @@
 ---
 automated_docker_container_default:
   docker_registry:
-    image: registry:2.4.1
+    image: registry:2.5.0
     name: docker-registry
     hostname: docker-registry
     published_ports:
@@ -9,6 +9,8 @@ automated_docker_container_default:
     volumes:
       - /var/lib/registry
       - /etc/docker/registry
+    # env:
+    #   REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
     #docker_registry_container_environment_config:
     #  SETTINGS_FLAVOR: s3
     #  AWS_BUCKET: acme-docker
