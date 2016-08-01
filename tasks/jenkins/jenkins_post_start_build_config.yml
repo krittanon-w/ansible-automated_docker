@@ -14,12 +14,12 @@
       automated_docker_jenkins_host_config_file_paths: "{{ automated_docker_jenkins_host_config_file_paths }} + [ '{{ automated_docker_jenkins_host_config_file_path }}' ]"
     with_items: "{{ group_names }}"
 
-  - name: Check if jenkins "{{ automated_docker_jenkins_config_filename }}" file is exists
+  - name: Check if jenkins "{{ automated_docker_jenkins_config_filename }}" template file exists
     stat:
       path: "{{ item }}"
     register: automated_docker_jenkins_config_check
     with_first_found:
-      - files: "{{ automated_docker_jenkins_host_config_file_paths }}"
+      - files: "{{ automated_docker_jenkins_host_config_file_paths }} + [ '{{ automated_docker_jenkins_templates_path }}/jenkins-{{ automated_docker_jenkins_config_filename }}.j2' ]"
         skip: true
   - name: Set jenkins "{{ automated_docker_jenkins_config_filename }}" file path
     set_fact:
