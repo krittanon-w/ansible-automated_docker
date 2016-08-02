@@ -183,9 +183,10 @@ automated_docker_jenkins_home: /var/jenkins_home
 automated_docker_jenkins_ssh_key_file_path: "{{ automated_docker_jenkins_home }}/.ssh/id_rsa"
 automated_docker_jenkins_ssh_key_host_path: "{{ playbook_dir }}/files/groups/{{ group_names[1] }}/jenkins/ssh"
 automated_docker_jenkins_credential_master_name: jenkins-ssh-master
-automated_docker_jenkins_slave_cloud_name: Jenkin Master
-automated_docker_jenkins_slave_cloud_label: all
-automated_docker_jenkins_slave_cloud_docker_image: winggundamth/ubuntu-jenkins-slave
+automated_docker_jenkins_slave_clouds:
+  name: Jenkin Master
+  label: all
+  image: winggundamth/ubuntu-jenkins-slave
 automated_docker_jenkins_slave_cloud_server_url: unix:///var/run/docker.sock
 
 # Default variables for Jenkins Slave Docker Cloud Action
@@ -193,68 +194,5 @@ automated_docker_jenkins_master_cert_path: "{{ automated_docker_machine_storage_
 automated_docker_jenkins_master_container_slave_base_cert_path: "{{ automated_docker_jenkins_home }}/cloud-docker-certs"
 automated_docker_jenkins_master_container_slave_cert_path: "{{ automated_docker_jenkins_master_container_slave_base_cert_path }}/{{ inventory_hostname }}"
 automated_docker_jenkins_master_host_tmp_config_path: "/tmp/container-jenkins-master-{{ automated_docker_jenkins_config_filename }}"
-# Need to separate variables since yml doesn't accept block in line in dict
-automated_docker_jenkins_master_cloud_docker_content:
-  config: "{{ automated_docker_jenkins_master_cloud_docker_content_config }}"
-  credentials: "{{ automated_docker_jenkins_master_cloud_docker_content_credentials }}"
-automated_docker_jenkins_master_cloud_docker_content_config: |
-    <com.nirima.jenkins.plugins.docker.DockerCloud plugin="docker-plugin@0.16.0">
-      <name>{{ automated_docker_jenkins_slave_cloud_name }}</name>
-      <templates>
-        <com.nirima.jenkins.plugins.docker.DockerTemplate>
-          <configVersion>2</configVersion>
-          <labelString>{{ automated_docker_jenkins_slave_cloud_label }}</labelString>
-          <launcher class="com.nirima.jenkins.plugins.docker.launcher.DockerComputerSSHLauncher">
-            <sshConnector plugin="ssh-slaves@1.11">
-              <port>22</port>
-              <credentialsId>{{ automated_docker_jenkins_credential_master_name }}</credentialsId>
-              <jvmOptions></jvmOptions>
-              <javaPath></javaPath>
-              <maxNumRetries>0</maxNumRetries>
-              <retryWaitTime>0</retryWaitTime>
-            </sshConnector>
-          </launcher>
-          <remoteFsMapping></remoteFsMapping>
-          <remoteFs>/home/jenkins</remoteFs>
-          <instanceCap>2147483647</instanceCap>
-          <mode>EXCLUSIVE</mode>
-          <retentionStrategy class="com.nirima.jenkins.plugins.docker.strategy.DockerOnceRetentionStrategy">
-            <idleMinutes>10</idleMinutes>
-            <idleMinutes defined-in="com.nirima.jenkins.plugins.docker.strategy.DockerOnceRetentionStrategy">10</idleMinutes>
-          </retentionStrategy>
-          <numExecutors>1</numExecutors>
-          <dockerTemplateBase>
-            <image>{{ automated_docker_jenkins_slave_cloud_docker_image }}</image>
-            <dockerCommand></dockerCommand>
-            <lxcConfString></lxcConfString>
-            <hostname></hostname>
-            <dnsHosts/>
-            <volumes/>
-            <volumesFrom2/>
-            <environment/>
-            <bindPorts></bindPorts>
-            <bindAllPorts>false</bindAllPorts>
-            <privileged>false</privileged>
-            <tty>false</tty>
-            <extraHosts class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
-              <c class="list"/>
-              <list reference="../c"/>
-            </extraHosts>
-          </dockerTemplateBase>
-          <removeVolumes>false</removeVolumes>
-          <pullStrategy>PULL_LATEST</pullStrategy>
-        </com.nirima.jenkins.plugins.docker.DockerTemplate>
-      </templates>
-      <serverUrl>{{ automated_docker_jenkins_slave_cloud_server_url }}</serverUrl>
-      <connectTimeout>0</connectTimeout>
-      <readTimeout>0</readTimeout>
-      <credentialsId>{{ group_names[1] }}</credentialsId>
-      <containerCap>100</containerCap>
-    </com.nirima.jenkins.plugins.docker.DockerCloud>
-automated_docker_jenkins_master_cloud_docker_content_credentials: |
-        <com.nirima.jenkins.plugins.docker.utils.DockerDirectoryCredentials plugin="docker-plugin@0.16.1">
-          <scope>GLOBAL</scope>
-          <id>{{ group_names[1] }}</id>
-          <description></description>
-          <path>{{ automated_docker_jenkins_master_container_slave_cert_path }}</path>
-        </com.nirima.jenkins.plugins.docker.utils.DockerDirectoryCredentials>
+automated_docker_jenkins_master_templates_path: "{{ automated_docker_jenkins_templates_path }}/jenkins-slave-{{ automated_docker_jenkins_config_filename }}.j2"
+automated_docker_jenkins_master_templates_tmp_path: "/tmp/container-jenkins-slave-{{ automated_docker_jenkins_config_filename }}"
