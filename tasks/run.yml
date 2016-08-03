@@ -27,7 +27,7 @@
   # https://github.com/ansible/ansible/issues/7367
   - name: Work around to fix problem on Docker for Mac public beta (Maybe take sometimes from pulling docker image)
     command: "docker run --rm=true --entrypoint true {{ automated_docker_run.image }}"
-    when: ansible_system == 'Darwin' and openstack_instance not defined
+    when: ansible_system == 'Darwin'
 
   - name: Create "{{ automated_docker_run.name }}" container if not exists
     docker_container:
