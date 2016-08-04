@@ -85,6 +85,22 @@ automated_docker_gitlab_registry_container_name: gitlab-registry
 automated_docker_gitlab_registry_key_file_path: "{{ role_path }}/files/gitlab/registry-auth.key"
 automated_docker_gitlab_registry_ssl_key_file_path: "{{ role_path }}/files/gitlab/registry-auth.key"
 automated_docker_gitlab_registry_ssl_crt_file_path: "{{ role_path }}/files/gitlab/registry-auth.crt"
+automated_docker_gitlab_cron_minute: "0"
+automated_docker_gitlab_cron_hour: "2"
+automated_docker_gitlab_cron_day: "*"
+automated_docker_gitlab_cron_weekday: "*"
+automated_docker_gitlab_cron_month: "*"
+# Support v3 only for now
+automated_docker_gitlab_cron_swift_domain: Default
+# automated_docker_gitlab_cron_swift_username: admin
+# automated_docker_gitlab_cron_swift_password: CHANGEME
+# automated_docker_gitlab_cron_swift_authurl: https://keystone.example.com/v3
+automated_docker_gitlab_cron_swift_project: admin
+automated_docker_gitlab_cron_swift_container: backup-gitlab
+automated_docker_gitlab_cron_swift_command: swift upload -c --skip-identical --object-name /
+automated_docker_gitlab_cron_swift_utilities_image: "{{ automated_docker_utilities_image }}"
+automated_docker_gitlab_cron_swift_utilities_container_name: "{{ automated_docker_utilities_container_name }}"
+automated_docker_gitlab_cron_swift_container_backup_path: /home/git/data/backups/
 
 # Default variables for GitLab Backup Action
 automated_docker_gitlab_action_backup_host_path: /tmp/gitlab-backups
