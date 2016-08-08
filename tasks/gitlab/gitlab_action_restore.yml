@@ -71,7 +71,7 @@
       name: "{{ automated_docker_gitlab_action_restore_container_name }}"
       image: "{{ automated_docker_run.image }}"
       command: "app:rake gitlab:backup:restore force=yes
-        BACKUP={{ automated_docker_gitlab_action_restore_file_name.split('_')[0] }}'"
+        BACKUP={{ automated_docker_gitlab_action_restore_file_name.split('_')[0] }}"
       links: "{{ automated_docker_run.links | default(omit) }}"
       env:
         GITLAB_SECRETS_DB_KEY_BASE: "{{ automated_docker_run.env.GITLAB_SECRETS_DB_KEY_BASE }}"
