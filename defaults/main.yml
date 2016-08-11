@@ -212,3 +212,10 @@ automated_docker_jenkins_master_container_slave_cert_path: "{{ automated_docker_
 automated_docker_jenkins_master_host_tmp_config_path: "/tmp/container-jenkins-master-{{ automated_docker_jenkins_config_filename }}"
 automated_docker_jenkins_master_templates_path: "{{ automated_docker_jenkins_templates_path }}/jenkins-slave-{{ automated_docker_jenkins_config_filename }}.j2"
 automated_docker_jenkins_master_templates_tmp_path: "/tmp/container-jenkins-slave-{{ automated_docker_jenkins_config_filename }}"
+
+automated_docker_sensu_client_json_templates:
+  - { src: 'config.json.j2', dest: '/tmp/container-sensu-config.json' }
+  - { src: 'client.json.j2', dest: '/tmp/container-sensu-client.json' }
+automated_docker_sensu_client_paths:
+  - { src: '/tmp/container-sensu-config.json', dest: '/etc/sensu/config.json' }
+  - { src: '/tmp/container-sensu-client.json', dest: '/etc/sensu/conf.d/client.json'}

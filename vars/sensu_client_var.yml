@@ -1,0 +1,13 @@
+---
+automated_docker_container_default:
+  sensu_client:
+    name: "{{ sensu_client_container_prefix }}client"
+    hostname: "{{ sensu_client_container_prefix }}client"
+    image: "{{ sensu_client_image_name }}"
+    state: started
+    pull: "{{ sensu_client_pull_new_docker_images }}"
+    exposed_ports:
+    - "3030:3030"
+    volumes:
+    - "/:/rootfs:ro"
+    - "/etc/sensu"

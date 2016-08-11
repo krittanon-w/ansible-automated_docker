@@ -1,0 +1,8 @@
+{
+  "client": {
+    "name": "{{ sensu_client_name }}",
+    "address": "{{ ansible_host }}",
+    "bind": "0.0.0.0",
+    "subscriptions": [{{ sensu_client_subscriptions_joined }}]
+  }
+}
