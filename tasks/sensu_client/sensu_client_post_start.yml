@@ -3,8 +3,7 @@
 # https://bugs.launchpad.net/ubuntu/+source/systemd/+bug/1555760
 
 - name: Force sensu client to send the first disk check to sensu server as part of workaround for Xenial
-  command: check-disk-usage.rb -w 85 -c 95
-  ignore_errors: yes
+  shell: check-disk-usage.rb -w 85 -c 95 || true
   delegate_to: "{{ automated_docker_run.name }}"
   when: automated_docker_create_result.changed and ansible_distribution_release == "xenial"
 
