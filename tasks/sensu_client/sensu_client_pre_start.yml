@@ -1,5 +1,5 @@
 ---
-- block: #Copy configuration files
+- block: # Copy configuration files
   - name: Create json configuration file
     template:
       src: "{{ item.src }}"
@@ -14,7 +14,7 @@
     with_items: "{{ automated_docker_sensu_client_paths }}"
     notify: Restart container
 
-- block: #Delete temp files
+- block: # Delete temp files
     - name: Delete temp json files
       file:
         path: "{{ item.src }}"

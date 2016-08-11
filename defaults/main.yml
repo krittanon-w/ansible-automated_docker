@@ -214,7 +214,7 @@ automated_docker_jenkins_master_templates_path: "{{ automated_docker_jenkins_tem
 automated_docker_jenkins_master_templates_tmp_path: "/tmp/container-jenkins-slave-{{ automated_docker_jenkins_config_filename }}"
 
 # Default variables for Sensu Client
-automated_docker_sensu_client_name: sensu-client-1
+automated_docker_sensu_client_name: "{{ inventory_hostname }}"
 automated_docker_sensu_client_subscriptions_joined: "\"{{ '\", \"'.join(automated_docker_sensu_client_subscriptions)}}\""
 automated_docker_sensu_client_subscriptions: ["application","service"]
 automated_docker_sensu_client_rabbitmq_host: 192.168.0.2
@@ -228,4 +228,4 @@ automated_docker_sensu_client_json_templates:
   - { src: 'client.json.j2', dest: '"{{ automated_docker_sensu_client_host_tmp_config_path }}"/container-sensu-client.json' }
 automated_docker_sensu_client_paths:
   - { src: '"{{ automated_docker_sensu_client_host_tmp_config_path }}"/container-sensu-config.json', dest: '"{{ automated_docker_sensu_client_container_config_path }}"/config.json' }
-  - { src: '"{{ automated_docker_sensu_client_host_tmp_config_path }}"/container-sensu-client.json', dest: '"{{ automated_docker_sensu_client_container_config_path }}"/conf.d/client.json'}
+  - { src: '"{{ automated_docker_sensu_client_host_tmp_config_path }}"/container-sensu-client.json', dest: '"{{ automated_docker_sensu_client_container_config_path }}"/conf.d/client.json' }
