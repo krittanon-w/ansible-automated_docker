@@ -58,7 +58,7 @@ frontend {{ automated_docker_haproxy_service_name }}-https-front
 {% endif %}
 
 backend {{ automated_docker_haproxy_service_name }}-back
-{% if automated_docker_haproxy_ssl_certificate_pem_file is defined %}
+{% if automated_docker_haproxy_forward_http and automated_docker_haproxy_ssl_certificate_pem_file is defined %}
     redirect scheme https code 301 if !{ ssl_fc }
 {% endif %}
     mode http

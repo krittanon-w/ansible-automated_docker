@@ -135,6 +135,7 @@ automated_docker_haproxy_check_fall: 3
 automated_docker_haproxy_check_interval: 2000
 automated_docker_haproxy_stats_username: haproxy
 automated_docker_haproxy_stats_password: CHANGEME
+automated_docker_haproxy_forward_http: false
 automated_docker_haproxy_ssl_certificate_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}"
 automated_docker_haproxy_ssl_certificate_paths: []
 #automated_docker_haproxy_ssl_certificate_pem_file: example.org.pem
