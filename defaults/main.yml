@@ -220,7 +220,7 @@ automated_docker_sensu_client_subscriptions:
   - application
   - service
 automated_docker_sensu_client_subscriptions_joined: "\"{{ '\", \"'.join(automated_docker_sensu_client_subscriptions)}}\""
-automated_docker_sensu_client_rabbitmq_host: 172.17.0.1
+#automated_docker_sensu_client_rabbitmq_host: 172.17.0.1
 automated_docker_sensu_client_rabbitmq_vhost: /sensu
 automated_docker_sensu_client_rabbitmq_username: sensu
 automated_docker_sensu_client_rabbitmq_password: CHANGEME
