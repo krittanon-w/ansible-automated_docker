@@ -1,9 +1,0 @@
----
-- block: # Copy configuration files
-
-  - name: Copy configuration to container
-    command: |
-      docker cp "{{ automated_docker_fluentd_config_file_path }}" \
-      "{{ automated_docker_run.name }}":"{{ automated_docker_fluentd_container_config_path }}"
-    with_items: "{{ group_names }}"
-    notify: Restart container

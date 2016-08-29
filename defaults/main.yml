@@ -239,4 +239,6 @@ automated_docker_sensu_client_paths:
 
 # Default variables for Fluentd
 automated_docker_fluentd_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/fluentd.conf"
-# automated_docker_fluentd_container_config_path: "/etc/td-agent/conf"
+automated_docker_fluentd_config_file_paths: []
+# automated_docker_fluentd_config_path: /etc/td-agent/conf
+automated_docker_fluentd_config_backup_path: /etc/td-agent/conf.bak
