@@ -239,6 +239,6 @@ automated_docker_sensu_client_paths:
 
 # Default variables for Fluentd
 # NOTE automated_docker_fluentd_config_repository is defined if you need to install fluentd container
-# automated_docker_fluentd_config_repository: git@git.example.com:rainmaker/fluentd-config.git
+# automated_docker_fluentd_config_repository: git@git.example.com:fluentd/fluentd-config.git
 automated_docker_fluentd_config_branch_name: master
 automated_docker_fluentd_config_path: /etc/td-agent/conf
