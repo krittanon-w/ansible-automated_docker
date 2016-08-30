@@ -238,7 +238,7 @@ automated_docker_sensu_client_paths:
     dest: "{{ automated_docker_sensu_client_container_config_path }}/conf.d/client.json"
 
 # Default variables for Fluentd
-automated_docker_fluentd_config_file_path: "{{ playbook_dir }}/files/groups/{{ item }}/{{ automated_docker_container.key }}/fluentd.conf"
-automated_docker_fluentd_config_file_paths: []
-# automated_docker_fluentd_config_path: /etc/td-agent/conf
-automated_docker_fluentd_config_backup_path: /etc/td-agent/conf.bak
+# NOTE automated_docker_fluentd_config_repository is defined if you need to install fluentd container
+# automated_docker_fluentd_config_repository: git@git.24x7th.com:rainmaker/fluentd-config.git
+automated_docker_fluentd_config_branch_name: master
+automated_docker_fluentd_config_path: /etc/td-agent/conf
